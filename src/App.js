@@ -1,23 +1,45 @@
-import logo from './logo.svg';
 import './App.css';
+import { useEffect, useState } from 'react';
+import Auth from './Authorization/auth';
+import api from './api';
+import Dashboard from './Dashboard/dashboard';
+import { usePopup } from './Popup';
+import Groups from './Groups/Groups';
+
+function Loading() {
+  return (
+    <div
+      className='gradient-background d-flex justify-content-center align-items-center'
+      style={{ height: '100vh' }}
+    >
+      <div className='spinner-border text-light' role='status'>
+        <span className='sr-only'></span>
+      </div>
+    </div>
+  );
+}
 
 function App() {
+  const [view, setView] = useState('loading');
+
+  useEffect(() => {
+    api.checkAuth().then(function (loggedIn) {
+      api.fetchDefaultConfiguration();
+      console.log(`Logged in: ${loggedIn}`);
+      if (loggedIn === true) {
+        setView('dashboard');
+      } else {
+        setView('auth');
+      }
+    });
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {view === 'loading' && <Loading />}
+      {view === 'auth' && <Auth switchView={setView} />}
+      {view === 'dashboard' && <Dashboard switchView={setView} view={view} />}
+      {view === 'groups' && <Groups switchView={setView} view={view} />}
     </div>
   );
 }
