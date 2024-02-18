@@ -362,15 +362,17 @@ function ProcessCard({process}) {
 
         if (res === 'start') {
             api.startProcess(process.id).then(() => {
-                e.target.innerHTML = wasHtml;
                 e.target.disabled = false;
                 e.enabled = true;
+            }).finally(() => {
+                e.target.innerHTML = wasHtml;
             });
         } else {
             api.stopProcess(process.id).then(() => {
-                e.target.innerHTML = wasHtml;
                 e.target.disabled = false;
                 e.enabled = true;
+            }).finally(() => {
+                e.target.innerHTML = wasHtml;
             });
         }
     };
@@ -391,8 +393,9 @@ function ProcessCard({process}) {
         }, 600);
 
         api.restartProcess(process.id).then(() => {
-            e.target.innerHTML = wasHtml;
             e.target.disabled = false;
+        }).finally(() => {
+            e.target.innerHTML = wasHtml;
         });
     };
 
@@ -541,8 +544,9 @@ function ProcessCard({process}) {
                                                 '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
 
                                             refreshAndSetStatsData().then(() => {
-                                                e.target.innerHTML = wasHtml;
                                                 e.target.disabled = false;
+                                            }).finally(() => {
+                                                e.target.innerHTML = wasHtml;
                                             });
                                         }}
                                     >
@@ -608,10 +612,10 @@ function ProcessCard({process}) {
                                 </div>
                                 <div>
                                     <h3>Events (last 30): </h3>
-                                    {renderEventsTable()}
                                     <Button onClick={refreshAndSetEventsData} disabled={loadingEvents}>
                                         {loadingEvents ? 'Refreshing...' : 'Refresh Events'}
                                     </Button>
+                                    {renderEventsTable()}
                                 </div>
                             </Container>
 

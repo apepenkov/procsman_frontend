@@ -67,6 +67,22 @@ const locales = {
     },
 };
 
+const validators = {
+    // validator format: [func, localization_key]
+    'configuration': {
+        'auto_restart_max_retries': (value) => [Number.isInteger(parseInt(value)) && value > 0 && value < 100, 'auto_restart_max_retries_invalid'],
+        'auto_restart_max_retries_frame': (value) => [Number.isInteger(parseInt(value)) && value > 0 && value < 1800, 'auto_restart_max_retries_frame_invalid'],
+        'auto_restart_delay': (value) => [Number.isInteger(parseInt(value)) && value > 0 && value < 180000, 'auto_restart_delay_invalid'],
+    },
+    'process': {
+        'name': (value) => [value.length > 0, 'process_name_required'],
+        'executable_path': (value) => [value.length > 0, 'executable_required'],
+    },
+    'group': {
+        'name': (value) => [value.length > 0, 'group_name_required'],
+    }
+}
+
 // ('RUNNING', 'STOPPED', 'CRASHED', 'STARTING', 'STOPPING', 'STOPPED_WILL_RESTART', 'CRASHED_WILL_RESTART', 'UNKNOWN');
 const processStatusColors = {
     RUNNING: '#00FF00',
@@ -281,12 +297,14 @@ class GroupInfo {
             this.id = data.id;
             this.name = data.name;
             this.color = data.color;
+            this.scripts_configuration = data.scripts_configuration;
             return;
         }
         this.placeholder = false;
         this.id = data.id;
         this.name = data.name;
         this.color = data.color;
+        this.scripts_configuration = new Map(Object.entries(data.scripts_configuration));
     }
 
     rgbaColor() {
@@ -404,16 +422,35 @@ class ApiInterface {
         this.popUpCallback(message, this.loc('close'), 'danger');
     }
 
-    loc(key) {
-        return (
-            locales[this.localeKey][key] ||
-            locales['en'][key] ||
-            '#missing_locale#' + key
-        );
+    loc() {
+        if (arguments.length === 0) {
+            throw new Error('No arguments');
+        }
+        // any amount of arguments
+        let curr = locales[this.localeKey] || locales['en'];
+        let path = ""
+        for (let i = 0; i < arguments.length; i++) {
+            path += [arguments][i] + '.'
+        }
+        path = path.substring(0, path.length - 1)
+        for (let i = 0; i < arguments.length; i++) {
+            curr = curr[arguments[i]];
+            if (curr === undefined) {
+                return '#missing_locale#' + path;
+            }
+        }
+        if (typeof curr === 'string') {
+            return curr;
+        }
+        throw new Error('Invalid locale');
     }
 
     errLoc(key) {
-        return this.loc('errors')[key];
+        return this.loc('errors', key)
+    }
+
+    valLoc(key) {
+        return this.loc('validators', key)
     }
 
     async request(
@@ -740,15 +777,15 @@ class ApiInterface {
         return defaultSeverConfiguration.get(key) || fallbackConfiguration.get(key);
     }
 
-    getConfiguration(key, group = null) {
-        if (group === null || this.lastGroupedProcesses === null) {
+    getConfiguration(key, targetGroup = null) {
+        if (targetGroup === null || this.lastGroupedProcesses === null) {
             return this._internalGetConfigurationWithFallback(key);
         }
 
         // It's expected that cache is already built.
         let foundGroup = null
         for (const [groupId, group] of Object.entries(this.lastGroupedProcesses.groups)) {
-            if (groupId === group) {
+            if (groupId == targetGroup) {
                 foundGroup = group
                 break
             }
@@ -758,12 +795,25 @@ class ApiInterface {
             return this._internalGetConfigurationWithFallback(key);
         }
 
-        let groupConfig = foundGroup.configuration
+        let groupConfig = foundGroup.scripts_configuration
         if (groupConfig === null) {
             return this._internalGetConfigurationWithFallback(key);
         }
 
         return groupConfig.get(key) || this._internalGetConfigurationWithFallback(key);
+    }
+
+    validate(where, what, value) {
+        if (validators[where] === undefined) {
+            throw new Error('Invalid where');
+        }
+        if (validators[where][what] === undefined) {
+            throw new Error('Invalid what');
+        }
+        if (validators[where][what](value)[0] === false) {
+            return this.valLoc(validators[where][what](value)[1]);
+        }
+        return null;
     }
 }
 
@@ -809,8 +859,19 @@ function buildGradient(from, percent = -0.2) {
     return `linear-gradient(135deg, ${from}, ${to})`;
 }
 
+const rgbaToHex = (rgba) => {
+    const {r, g, b, a} = rgba;
+    // we also must prefix the hex value with a '#' symbol
+    // and each component with a 2 digit zero-padded hex value
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}${Math.round(
+        a * 255
+    )
+        .toString(16)
+        .padStart(2, '0')}`;
+};
+
 const api = new ApiInterface();
 export default api;
 window.api = api;
 
-export {ProcessInfo, buildGradient, GroupInfo};
+export {ProcessInfo, buildGradient, GroupInfo, rgbaToHex};
