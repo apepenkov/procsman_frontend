@@ -97,8 +97,8 @@ const processStatusColors = {
 
 const fallbackConfiguration = new Map(
     Object.entries({
-            "auto_restart_on_stop": true,
-            "auto_restart_on_crash": true,
+            "auto_auto_restart_on_stop": true,
+            "auto_auto_restart_on_crash": true,
 
             "auto_restart_max_retries": 3,
             "auto_restart_max_retries_frame": 60,
@@ -117,8 +117,13 @@ const fallbackConfiguration = new Map(
 
 const defaultSeverConfiguration = new Map();
 
+
 class ProcessInfo {
     constructor(data) {
+        this.updateWith(data);
+    }
+
+    updateWith(data) {
         if (data === null) {
             this.placeholder = true;
             return;
@@ -135,7 +140,12 @@ class ProcessInfo {
             this.working_directory = data.working_directory;
             this.environment = data.environment;
             this.status = data.status;
-            this.configuration = data.configuration;
+            // if it's already a map
+            if (data.configuration instanceof Map) {
+                this.configuration = data.configuration;
+            } else {
+                this.configuration = new Map(Object.entries(data.configuration));
+            }
             this.pinned = data.pinned;
             return;
         }
@@ -150,7 +160,7 @@ class ProcessInfo {
         this.working_directory = data.working_directory;
         this.environment = data.environment;
         this.status = data.status;
-        this.configuration = data.configuration;
+        this.configuration = new Map(Object.entries(data.configuration));
         this.pinned = null;
     }
 
@@ -284,6 +294,13 @@ class ProcessInfo {
         }
         return cmdLine;
     }
+
+    getConfiguration(key) {
+        if (this.configuration === null) {
+            return api.getConfiguration(key, this.process_group_id);
+        }
+        return this.configuration.get(key) || api.getConfiguration(key, this.process_group_id);
+    }
 }
 
 class GroupInfo {
@@ -344,30 +361,34 @@ class ApiResponse {
         this.json = null;
         this.text = null;
         this.status = null;
+        this.response = null;
     }
 
-    static async create(response) {
+    static async create(response, consume=true) {
         const apiResponse = new ApiResponse();
         apiResponse.status = response.status;
 
-        if (
-            (response.headers.get('Content-Type') || '')
-                .toLowerCase()
-                .includes('application/json')
-        ) {
-            try {
-                apiResponse.json = await response.json();
-                apiResponse.text = JSON.stringify(apiResponse.json);
-            } catch (error) {
-                console.error('Error parsing JSON:', error);
-            }
-        } else {
-            try {
-                apiResponse.text = await response.text();
-                // Only set `json` if you have a specific need to parse text as JSON here,
-                // otherwise, it might be better to leave it as null or handle accordingly.
-            } catch (error) {
-                console.error('Error reading text:', error);
+        apiResponse.response = response;
+        if (consume) {
+            if (
+                (response.headers.get('Content-Type') || '')
+                    .toLowerCase()
+                    .includes('application/json')
+            ) {
+                try {
+                    apiResponse.json = await response.json();
+                    apiResponse.text = JSON.stringify(apiResponse.json);
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
+                }
+            } else {
+                try {
+                    apiResponse.text = await response.text();
+                    // Only set `json` if you have a specific need to parse text as JSON here,
+                    // otherwise, it might be better to leave it as null or handle accordingly.
+                } catch (error) {
+                    console.error('Error reading text:', error);
+                }
             }
         }
 
@@ -395,12 +416,14 @@ class ApiResponse {
 
 class ApiInterface {
     constructor() {
-        this.url = 'http://apepenkov-pc.lan:25812';
+        // this.url = 'http://apepenkov-pc.lan:25812';
+        this.url = 'http://localhost:25812';
         this.localeKey = window.localStorage.getItem('locale') || 'en';
         this.authToken = window.localStorage.getItem('authToken');
         this.popUpCallback = null;
         this.cardsChangedCallbackDashboard = null;
         this.cardsChangedCallbackNavbar = null;
+        this.groupsChangedProcessEditCallback = null;
         this.lastGroupedProcesses = null;
 
         this.ticker();
@@ -408,10 +431,16 @@ class ApiInterface {
 
     // a ticker that calls this.mbCallback() every 10 seconds
     ticker() {
-        setInterval(() => {
-            (this.cardsChangedCallbackDashboard || this.cardsChangedCallbackNavbar) &&
-            this.mbCallback();
-        }, 1000);
+        if (this.cardsChangedCallbackDashboard || this.cardsChangedCallbackNavbar || this.groupsChangedProcessEditCallback)
+        {
+            this.mbCallbackAsync().finally(() => {
+                setTimeout(() => {
+                    this.ticker()
+                }, 1000)
+            })
+        } else {
+            setTimeout(() => {this.ticker()}, 1000)
+        }
     }
 
     setPopUpCallback(callback) {
@@ -452,14 +481,16 @@ class ApiInterface {
     valLoc(key) {
         return this.loc('validators', key)
     }
-
+    // TODO: allow for params
     async request(
         method,
         path,
         json,
         showPopup = true,
         raise_for_status = true,
-        do_throw = false
+        do_throw = false,
+        params = null,
+        consume = true
     ) {
         if (json === undefined) {
             json = null;
@@ -471,14 +502,21 @@ class ApiInterface {
         if (this.authToken) {
             headers['X-Auth-Key'] = this.authToken;
         }
-        if (json) {
+        if (json !== null) {
             headers['Content-Type'] = 'application/json';
         }
 
         let response;
 
+        const fullUrl = new URL(this.url + path);
+        if (params) {
+            Object.keys(params).forEach((key) =>
+                fullUrl.searchParams.append(key, params[key])
+            );
+        }
+
         try {
-            response = await fetch(this.url + path, {
+            response = await fetch(fullUrl, {
                 mode: 'cors',
                 method: method,
                 headers: headers,
@@ -496,7 +534,7 @@ class ApiInterface {
         }
         let apiResponse;
         try {
-            apiResponse = await ApiResponse.create(response);
+            apiResponse = await ApiResponse.create(response, consume);
         } catch (e) {
             console.error('Error creating ApiResponse:', e);
             showPopup &&
@@ -599,6 +637,31 @@ class ApiInterface {
         this.cardsChangedCallbackNavbar = callback;
     }
 
+    setGroupsChangedProcessEditCallback(callback) {
+        this.groupsChangedProcessEditCallback = callback;
+    }
+
+    async mbCallbackAsync(useLastCached = false) {
+        if (useLastCached) {
+            if (this.lastGroupedProcesses !== null) {
+                this.cardsChangedCallbackDashboard !== null &&
+                this.cardsChangedCallbackDashboard(this.lastGroupedProcesses);
+                this.cardsChangedCallbackNavbar !== null &&
+                this.cardsChangedCallbackNavbar(this.lastGroupedProcesses);
+                this.groupsChangedProcessEditCallback !== null &&
+                this.groupsChangedProcessEditCallback(this.lastGroupedProcesses);
+            }
+        } else {
+            const data = await this.getGroupedProcesses()
+            this.cardsChangedCallbackDashboard !== null &&
+            this.cardsChangedCallbackDashboard(data);
+            this.cardsChangedCallbackNavbar !== null &&
+            this.cardsChangedCallbackNavbar(data);
+            this.groupsChangedProcessEditCallback !== null &&
+            this.groupsChangedProcessEditCallback(data);
+        }
+    }
+
     mbCallback(useLastCached = false) {
         if (useLastCached) {
             if (this.lastGroupedProcesses !== null) {
@@ -606,6 +669,8 @@ class ApiInterface {
                 this.cardsChangedCallbackDashboard(this.lastGroupedProcesses);
                 this.cardsChangedCallbackNavbar !== null &&
                 this.cardsChangedCallbackNavbar(this.lastGroupedProcesses);
+                this.groupsChangedProcessEditCallback !== null &&
+                this.groupsChangedProcessEditCallback(this.lastGroupedProcesses);
             }
         } else {
             this.getGroupedProcesses().then((data) => {
@@ -613,6 +678,8 @@ class ApiInterface {
                 this.cardsChangedCallbackDashboard(data);
                 this.cardsChangedCallbackNavbar !== null &&
                 this.cardsChangedCallbackNavbar(data);
+                this.groupsChangedProcessEditCallback !== null &&
+                this.groupsChangedProcessEditCallback(data);
             });
         }
     }
@@ -693,18 +760,12 @@ class ApiInterface {
 
     async getProcessStats(processId, from = null, to = null) {
         let url = '/processes/by_id/' + processId + '/stats';
-        if (from !== null || to !== null) {
-            // convert to RFC3339
-            url += '?';
-            if (from !== null) {
-                url += 'from=' + from.toISOString();
-            }
-            if (to !== null) {
-                if (from !== null) {
-                    url += '&';
-                }
-                url += 'to=' + to.toISOString();
-            }
+        const params = {}
+        if (from) {
+            params.from = from.toISOString();
+        }
+        if (to) {
+            params.to = to.toISOString();
         }
         try {
             const res = await this.request(
@@ -712,7 +773,10 @@ class ApiInterface {
                 url,
                 null,
                 true,
-                true
+                true,
+                false,
+                params
+
             );
             return res;
         } catch (e) {
@@ -722,32 +786,23 @@ class ApiInterface {
 
     async getProcessEvents(processId, from = null, to = null, limit = 30) {
         let url = '/processes/by_id/' + processId + '/events';
-        if (from !== null || to !== null || limit !== null) {
-            // convert to RFC3339
-            url += '?';
-            if (from !== null) {
-                url += 'from=' + from.toISOString();
-            }
-            if (to !== null) {
-                if (from !== null) {
-                    url += '&';
-                }
-                url += 'to=' + to.toISOString();
-            }
-            if (limit !== null) {
-                if (from !== null || to !== null) {
-                    url += '&';
-                }
-                url += 'limit=' + limit;
-            }
+        const params = {}
+        if (from) {
+            params.from = from.toISOString();
         }
+        if (to) {
+            params.to = to.toISOString();
+        }
+        params.limit = limit;
         try {
             const res = await this.request(
                 'GET',
                 url,
                 null,
                 true,
-                true
+                true,
+                false,
+                params
             );
             return res;
         } catch (e) {
@@ -785,6 +840,7 @@ class ApiInterface {
         // It's expected that cache is already built.
         let foundGroup = null
         for (const [groupId, group] of Object.entries(this.lastGroupedProcesses.groups)) {
+            // noinspection EqualityComparisonWithCoercionJS
             if (groupId == targetGroup) {
                 foundGroup = group
                 break
@@ -814,6 +870,90 @@ class ApiInterface {
             return this.valLoc(validators[where][what](value)[1]);
         }
         return null;
+    }
+
+    async getProcessLogs(processId, from = null, to = null) {
+        let url = '/processes/by_id/' + processId + '/logs';
+        const params = {}
+        if (from) {
+            params.from = from.toISOString();
+        }
+        if (to) {
+            params.to = to.toISOString();
+        }
+        try {
+            const res = await this.request(
+                'GET',
+                url,
+                null,
+                true,
+                true,
+                false,
+                params
+            );
+            return res;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async putStdin(processId, data) {
+        try {
+            const res = await this.request(
+                'PUT',
+                '/processes/by_id/' + processId + '/stdin',
+                {
+                    text: data
+                },
+                true,
+                true
+            );
+            return res;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async downloadLogsZipFile(processId, from = null, to = null) {
+        let url = '/processes/by_id/' + processId + '/export_logs';
+        const params = {}
+        if (from) {
+            params.from = from.toISOString();
+        }
+        if (to) {
+            params.to = to.toISOString();
+        }
+        try {
+            const res = await this.request(
+                'GET',
+                url,
+                null,
+                true,
+                true,
+                false,
+                params,
+                false
+            );
+            return res;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async editProcess(processId, processData) {
+        try {
+            const res = await this.request(
+                'PATCH',
+                '/processes/by_id/' + processId,
+                processData,
+                true,
+                true
+            );
+            await this.mbCallback();
+            return res;
+        } catch (e) {
+            return null;
+        }
     }
 }
 
@@ -870,8 +1010,19 @@ const rgbaToHex = (rgba) => {
         .padStart(2, '0')}`;
 };
 
+const hexToRgba = (hex) => {
+    // we remove the '#' symbol if it exists
+    hex = hex.replace('#', '');
+    // we separate the RGB components
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const a = parseInt(hex.substring(6, 8), 16) / 255;
+    return {r, g, b, a};
+};
+
 const api = new ApiInterface();
 export default api;
 window.api = api;
 
-export {ProcessInfo, buildGradient, GroupInfo, rgbaToHex};
+export {ProcessInfo, buildGradient, GroupInfo, rgbaToHex, hexToRgba};

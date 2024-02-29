@@ -57,8 +57,8 @@ const NewProcessModal = ({show, handleClose, groups}) => {
 
 
     // configuration
-    const [autoRestartOnStop, setAutoRestartOnStop] = useState(api.getConfiguration('auto_restart_on_stop'));
-    const [autoRestartOnCrash, setAutoRestartOnCrash] = useState(api.getConfiguration('auto_restart_on_crash'));
+    const [autoRestartOnStop, setAutoRestartOnStop] = useState(api.getConfiguration('auto_auto_restart_on_stop'));
+    const [autoRestartOnCrash, setAutoRestartOnCrash] = useState(api.getConfiguration('auto_auto_restart_on_crash'));
     const [autoRestartMaxRetries, setAutoRestartMaxRetries] = useState(api.getConfiguration('auto_restart_max_retries'));
     const [autoRestartMaxRetriesFrame, setAutoRestartMaxRetriesFrame] = useState(api.getConfiguration('auto_restart_max_retries_frame'));
     const [autoRestartDelay, setAutoRestartDelay] = useState(api.getConfiguration('auto_restart_delay'));
@@ -107,15 +107,18 @@ const NewProcessModal = ({show, handleClose, groups}) => {
             enabled: enabled,
             create_new_group: false,
             new_group: {},
-            configuration: {
-                restart_on_stop: autoRestartOnStop,
-                restart_on_crash: autoRestartOnCrash,
-                max_retries: parseInt(autoRestartMaxRetries),
-                retry_timeframe: parseInt(autoRestartMaxRetriesFrame),
-                retry_delay: parseInt(autoRestartDelay),
-                notify_on_crash: notifyOnCrash,
-                notify_on_stop: notifyOnStop,
+            config: {
+                auto_restart_on_stop: autoRestartOnStop,
+                auto_restart_on_crash: autoRestartOnCrash,
+
+                auto_restart_max_retries: parseInt(autoRestartMaxRetries),
+                auto_restart_max_retries_frame: parseInt(autoRestartMaxRetriesFrame),
+                auto_restart_delay: parseInt(autoRestartDelay),
+
                 notify_on_start: notifyOnStop,
+                notify_on_stop: notifyOnStop,
+                notify_on_crash: notifyOnCrash,
+
                 record_stats: recordStats,
                 store_logs: storeLogs,
             },
@@ -144,17 +147,17 @@ const NewProcessModal = ({show, handleClose, groups}) => {
             errors.executablePath = 'Executable path is required';
         }
 
-        const maxRetriesErr = api.validate("configuration", "auto_restart_max_retries", NewProcessParams.configuration.max_retries);
+        const maxRetriesErr = api.validate("configuration", "auto_restart_max_retries", NewProcessParams.config.auto_restart_max_retries);
         if (maxRetriesErr !== null) {
             errors.processRestartMaxRetries = maxRetriesErr;
         }
 
-        const maxRetriesFrameErr = api.validate("configuration", "auto_restart_max_retries_frame", NewProcessParams.configuration.retry_timeframe);
+        const maxRetriesFrameErr = api.validate("configuration", "auto_restart_max_retries_frame", NewProcessParams.config.auto_restart_max_retries_frame);
         if (maxRetriesFrameErr !== null) {
             errors.processRestartTimeFrame = maxRetriesFrameErr;
         }
 
-        const maxRetriesDelayErr = api.validate("configuration", "auto_restart_delay", NewProcessParams.configuration.retry_delay);
+        const maxRetriesDelayErr = api.validate("configuration", "auto_restart_delay", NewProcessParams.config.auto_restart_delay);
         if (maxRetriesDelayErr !== null) {
             errors.processRestartDelay = maxRetriesDelayErr;
         }
@@ -164,18 +167,18 @@ const NewProcessModal = ({show, handleClose, groups}) => {
             return;
         }
         // warn user, if the retry configuration will not ever stop
-        const max_retries_within_timeframe = Math.floor(
-            (NewProcessParams.configuration.retry_timeframe * 1000) /
-            NewProcessParams.configuration.retry_delay
+        const auto_restart_max_retries_within_timeframe = Math.floor(
+            (NewProcessParams.config.auto_restart_max_retries_frame * 1000) /
+            NewProcessParams.config.auto_restart_delay
         );
-        const wasWarned = formErrors.warned_about_max_retries !== undefined;
+        const wasWarned = formErrors.warned_about_auto_restart_max_retries !== undefined;
 
         if (
-            max_retries_within_timeframe < NewProcessParams.configuration.max_retries
+            auto_restart_max_retries_within_timeframe < NewProcessParams.config.auto_restart_max_retries
         ) {
             if (!wasWarned) {
-                errors.warned_about_max_retries = true;
-                errors.processRestartMaxRetries = `The process will never stop retrying, because it can retry ${max_retries_within_timeframe} times within the timeframe of ${NewProcessParams.configuration.retry_timeframe} seconds with the delay of ${NewProcessParams.configuration.retry_delay} milliseconds. Click "Create" again to confirm.`;
+                errors.warned_about_auto_restart_max_retries = true;
+                errors.processRestartMaxRetries = `The process will never stop retrying, because it can retry ${auto_restart_max_retries_within_timeframe} times within the timeframe of ${NewProcessParams.config.auto_restart_max_retries_frame} seconds with the delay of ${NewProcessParams.config.auto_restart_delay} milliseconds. Click "Create" again to confirm.`;
                 setFormErrors(errors);
                 return;
             }
@@ -184,8 +187,10 @@ const NewProcessModal = ({show, handleClose, groups}) => {
         setFormErrors({});
 
         console.log(NewProcessParams);
-        const wasHtml = document.getElementById('createProcessBtn').innerHTML;
-        document.getElementById('createProcessBtn').innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        const element = document.getElementById('createProcessBtn');
+        const wasHtml = element.innerHTML;
+        element.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        element.disabled = true;
         if (doCreate) {
             api.createProcess(NewProcessParams).then((r) => {
                 if (r !== null && r !== undefined && !r.isErr()) {
@@ -202,8 +207,8 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     setProgramArguments('');
                     setWorkingDirectory('');
                     setEnabled(true);
-                    setAutoRestartOnStop(api.getConfiguration('auto_restart_on_stop'));
-                    setAutoRestartOnCrash(api.getConfiguration('auto_restart_on_crash'));
+                    setAutoRestartOnStop(api.getConfiguration('auto_auto_restart_on_stop'));
+                    setAutoRestartOnCrash(api.getConfiguration('auto_auto_restart_on_crash'));
                     setAutoRestartMaxRetries(api.getConfiguration('auto_restart_max_retries'));
                     setAutoRestartMaxRetriesFrame(api.getConfiguration('auto_restart_max_retries_frame'));
                     setAutoRestartDelay(api.getConfiguration('auto_restart_delay'));
@@ -217,7 +222,8 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     // setFormErrors({processName: r.asApiError().details});
                 }
             }).finally(() => {
-                document.getElementById('createProcessBtn').innerHTML = wasHtml;
+                element.innerHTML = wasHtml;
+                element.disabled = false;
             });
         }
     };
@@ -259,7 +265,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     type='switch'
                     id='custom-switch'
                     label='Enabled'
-                    defaultChecked={enabled}
+                    checked={enabled}
                     onChange={
                         /* Change Enabled/Disabled label */
                         (e) => {
@@ -357,8 +363,8 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                             const value = e.target.value;
                             setSelectedGroupId(value);
                             if (value !== 'addNew' && value !== null) {
-                                setAutoRestartOnStop(api.getConfiguration('auto_restart_on_stop', value));
-                                setAutoRestartOnCrash(api.getConfiguration('auto_restart_on_crash', value));
+                                setAutoRestartOnStop(api.getConfiguration('auto_auto_restart_on_stop', value));
+                                setAutoRestartOnCrash(api.getConfiguration('auto_auto_restart_on_crash', value));
                                 setAutoRestartMaxRetries(api.getConfiguration('auto_restart_max_retries', value));
                                 setAutoRestartMaxRetriesFrame(api.getConfiguration('auto_restart_max_retries_frame', value));
                                 setAutoRestartDelay(api.getConfiguration('auto_restart_delay', value));
@@ -478,7 +484,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     <Form.Check
                         type='switch'
                         label='Automatically restart when stopped (exit 0)'
-                        defaultChecked={autoRestartOnStop}
+                        checked={autoRestartOnStop}
                         onChange={(e) => setAutoRestartOnStop(e.target.checked)}
                     />
                 </Form.Group>
@@ -486,7 +492,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     <Form.Check
                         type='switch'
                         label='Automatically restart when crashed (exit non-0)'
-                        defaultChecked={autoRestartOnCrash}
+                        checked={autoRestartOnCrash}
                         onChange={(e) => setAutoRestartOnCrash(e.target.checked)}
                     />
                 </Form.Group>
@@ -494,7 +500,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     <Form.Label>Max Retries</Form.Label>
                     <Form.Control
                         type='number'
-                        defaultValue={autoRestartMaxRetries}
+                        value={autoRestartMaxRetries}
                         onChange={(e) => {
                             const val = e.target.value;
                             const validationErr = api.validate("configuration", "auto_restart_max_retries", val);
@@ -522,7 +528,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     </Form.Label>
                     <Form.Control
                         type='number'
-                        defaultValue={autoRestartMaxRetriesFrame}
+                        value={autoRestartMaxRetriesFrame}
                         onChange={(e) => {
                             const val = e.target.value;
                             const validationErr = api.validate("configuration", "auto_restart_max_retries_frame", val);
@@ -549,7 +555,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     </Form.Label>
                     <Form.Control
                         type='number'
-                        defaultValue={autoRestartDelay}
+                        value={autoRestartDelay}
                         onChange={(e) => {
                             const val = e.target.value;
                             const validationErr = api.validate("configuration", "auto_restart_delay", val);
@@ -573,32 +579,32 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                 <Form.Group>
                     <Form.Check
                         type='switch' label='Notify on crash'
-                        defaultChecked={notifyOnCrash}
+                        checked={notifyOnCrash}
                         onChange={(e) => setNotifyOnCrash(e.target.checked)}
                     />
                 </Form.Group>
                 <Form.Group>
                     <Form.Check
                         type='switch' label='Notify on stop'
-                        defaultChecked={notifyOnStop}
+                        checked={notifyOnStop}
                         onChange={(e) => setNotifyOnStop(e.target.checked)}
                     />
                 </Form.Group>
                 <Form.Group>
                     <Form.Check type='switch' label='Notify on start'
-                                defaultChecked={notifyOnStart}
+                                checked={notifyOnStart}
                                 onChange={(e) => setNotifyOnStart(e.target.checked)}
                     />
                 </Form.Group>
                 {/*<Form.Group>*/}
                 {/*    <Form.Check type='switch' label='Record stats'*/}
-                {/*                defaultChecked={recordStats}*/}
+                {/*                checked={recordStats}*/}
                 {/*                onChange={(e) => setRecordStats(e.target.checked)}*/}
                 {/*    />*/}
                 {/*</Form.Group>*/}
                 {/*<Form.Group>*/}
                 {/*    <Form.Check type='switch' label='Store logs'*/}
-                {/*                defaultChecked={storeLogs}*/}
+                {/*                checked={storeLogs}*/}
                 {/*                onChange={(e) => setStoreLogs(e.target.checked)}*/}
                 {/*    />*/}
                 {/*</Form.Group>*/}

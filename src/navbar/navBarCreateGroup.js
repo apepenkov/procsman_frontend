@@ -39,8 +39,8 @@ const NewGroupModal = ({show, handleClose, groups}) => {
     ] = useState(false);
 
     // configuration
-    const [autoRestartOnStop, setAutoRestartOnStop] = useState(api.getConfiguration('auto_restart_on_stop'));
-    const [autoRestartOnCrash, setAutoRestartOnCrash] = useState(api.getConfiguration('auto_restart_on_crash'));
+    const [autoRestartOnStop, setAutoRestartOnStop] = useState(api.getConfiguration('auto_auto_restart_on_stop'));
+    const [autoRestartOnCrash, setAutoRestartOnCrash] = useState(api.getConfiguration('auto_auto_restart_on_crash'));
     const [autoRestartMaxRetries, setAutoRestartMaxRetries] = useState(api.getConfiguration('auto_restart_max_retries'));
     const [autoRestartMaxRetriesFrame, setAutoRestartMaxRetriesFrame] = useState(api.getConfiguration('auto_restart_max_retries_frame'));
     const [autoRestartDelay, setAutoRestartDelay] = useState(api.getConfiguration('auto_restart_delay'));
@@ -57,8 +57,8 @@ const NewGroupModal = ({show, handleClose, groups}) => {
             name: newGroupName,
             color: rgbaToHex(newGroupColor),
             config: {
-                auto_restart_on_stop: autoRestartOnStop,
-                auto_restart_on_crash: autoRestartOnCrash,
+                auto_auto_restart_on_stop: autoRestartOnStop,
+                auto_auto_restart_on_crash: autoRestartOnCrash,
                 auto_restart_max_retries: parseInt(autoRestartMaxRetries),
                 auto_restart_max_retries_frame: parseInt(autoRestartMaxRetriesFrame),
                 auto_restart_delay: parseInt(autoRestartDelay),
@@ -75,8 +75,10 @@ const NewGroupModal = ({show, handleClose, groups}) => {
         }
         setFormErrors({});
         console.log(NewGroupParams);
-        const wasHtml = document.getElementById('createGroupBtn').innerHTML;
-        document.getElementById('createGroupBtn').innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        const elem = document.getElementById('createGroupBtn');
+        const wasHtml = elem.innerHTML;
+        elem.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        elem.disabled = true;
         api.createGroup(NewGroupParams).then((r) => {
             if (r !== null && r !== undefined && !r.isErr()) {
                 handleClose('createGroup')();
@@ -87,7 +89,8 @@ const NewGroupModal = ({show, handleClose, groups}) => {
             }
         }).finally(
             () => {
-                document.getElementById('createGroupBtn').innerHTML = wasHtml;
+                elem.innerHTML = wasHtml;
+                elem.disabled = false;
             }
         );
     };
