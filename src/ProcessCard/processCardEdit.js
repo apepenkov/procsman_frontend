@@ -8,9 +8,12 @@ import {
 } from 'react-bootstrap';
 import {
     X,
+    Pencil,
 } from 'react-bootstrap-icons'; // Importing icons
 import {SketchPicker} from 'react-color';
 import api, {hexToRgba, rgbaToHex} from '../api';
+import loadingSpinner from "../loadingSpinner";
+
 
 function ProcessCardEdit({process, selectedTab, showDetails, setShowDetails}) {
     const [groups, setGroups] = useState([]);
@@ -123,6 +126,8 @@ function ProcessCardEdit({process, selectedTab, showDetails, setShowDetails}) {
     // UNUSED
     const [recordStats, setRecordStats] = useState(api.getConfiguration('record_stats'));
     const [storeLogs, setStoreLogs] = useState(api.getConfiguration('store_logs'));
+
+    const [updatingProcess, setUpdatingProcess] = useState(false);
 
     const handleEnvVarChange = (index, key, value) => {
         const newEnvVars = [...envVars];
@@ -275,10 +280,7 @@ function ProcessCardEdit({process, selectedTab, showDetails, setShowDetails}) {
         setFormErrors({});
 
         console.log(patchProcessParams);
-        const element = document.getElementById('updateProcessBtn');
-        const wasHtml = element.innerHTML;
-        element.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-        element.disabled = true;
+        setUpdatingProcess(true);
         if (do_) {
             api.editProcess(process.id, patchProcessParams).then((r) => {
                 if (r !== null && r !== undefined && !r.isErr()) {
@@ -288,8 +290,7 @@ function ProcessCardEdit({process, selectedTab, showDetails, setShowDetails}) {
                     // setFormErrors({processName: r.asApiError().details});
                 }
             }).finally(() => {
-                element.innerHTML = wasHtml;
-                element.disabled = false;
+                setUpdatingProcess(false);
             });
         }
     };
@@ -532,7 +533,10 @@ function ProcessCardEdit({process, selectedTab, showDetails, setShowDetails}) {
             ))}
             <tr>
                 <td colSpan='3'>
-                    <Button onClick={addEnvVar}>Add Variable</Button>
+                    <Button onClick={addEnvVar}>
+                        <X style={{fontSize: '1.5rem', rotate: '45deg'}}/>
+                        Add Variable
+                    </Button>
                 </td>
             </tr>
             </tbody>
@@ -672,8 +676,12 @@ function ProcessCardEdit({process, selectedTab, showDetails, setShowDetails}) {
         <Button
             id='updateProcessBtn'
             onClick={() => editProcess(true)}
+            disabled={updatingProcess}
+            variant={"success"}
         >
-            Update
+            {updatingProcess ? loadingSpinner() : <div>
+                <Pencil style={{marginBottom: '2px'}}/> Save
+            </div>}
         </Button>
     </Container>;
 

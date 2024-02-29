@@ -20,6 +20,7 @@ import {
 import {
     CanvasRenderer,
 } from 'echarts/renderers';
+import loadingSpinner from "../loadingSpinner";
 
 // Register the required components
 echarts.use(
@@ -260,7 +261,7 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
         }
         // This effect should run when `showDetails` changes and when the chart data changes
         // You might need to adjust dependencies based on your data fetching and updating logic
-    }, [showDetails, cpuChartData, ramChartData]);
+    }, [showDetails, selectedTab, cpuChartData, ramChartData]);
 
 
 
@@ -272,8 +273,7 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
                     e.target.disabled = true;
                     // set spinner
                     const wasHtml = e.target.innerHTML;
-                    e.target.innerHTML =
-                        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+                    e.target.innerHTML = loadingSpinner();
 
                     refreshAndSetStatsData().then(() => {
                     }).finally(() => {

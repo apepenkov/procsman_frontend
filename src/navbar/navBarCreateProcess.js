@@ -10,6 +10,7 @@ import {
 } from 'react-bootstrap-icons'; // Importing icons
 import api, {rgbaToHex} from '../api';
 import {SketchPicker} from 'react-color';
+import loadingSpinner from "../loadingSpinner";
 
 const NewProcessModal = ({show, handleClose, groups}) => {
     const [processColor, setProcessColor] = useState({
@@ -69,6 +70,8 @@ const NewProcessModal = ({show, handleClose, groups}) => {
     // UNUSED
     const [recordStats, setRecordStats] = useState(api.getConfiguration('record_stats'));
     const [storeLogs, setStoreLogs] = useState(api.getConfiguration('store_logs'));
+
+    const [savingProcess, setSavingProcess] = useState(false);
 
     const handleEnvVarChange = (index, key, value) => {
         const newEnvVars = [...envVars];
@@ -187,10 +190,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
         setFormErrors({});
 
         console.log(NewProcessParams);
-        const element = document.getElementById('createProcessBtn');
-        const wasHtml = element.innerHTML;
-        element.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-        element.disabled = true;
+        setSavingProcess(true);
         if (doCreate) {
             api.createProcess(NewProcessParams).then((r) => {
                 if (r !== null && r !== undefined && !r.isErr()) {
@@ -222,8 +222,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     // setFormErrors({processName: r.asApiError().details});
                 }
             }).finally(() => {
-                element.innerHTML = wasHtml;
-                element.disabled = false;
+                setSavingProcess(true);
             });
         }
     };
@@ -618,10 +617,11 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     id='createProcessBtn'
                     variant='primary'
                     onClick={CreateProcess}
-                    disabled={Object.keys(formErrors).length > 0}
-
+                    disabled={Object.keys(formErrors).length > 0 || savingProcess}
                 >
-                    Create
+                    {savingProcess ? loadingSpinner() : <div>
+                        <X style={{fontSize: '1.5rem', rotate: '45deg'}}/> Create
+                    </div>}
                 </Button>
             </Modal.Footer>
         </Modal>

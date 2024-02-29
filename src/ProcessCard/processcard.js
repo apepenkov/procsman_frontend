@@ -14,6 +14,7 @@ import api from '../api';
 import ProcessCardStats from "./processCardStats";
 import ProcessCardLogs from "./processCardLogs";
 import ProcessCardEdit from "./processCardEdit";
+import loadingSpinner from "../loadingSpinner";
 
 
 function ProcessCard({process}) {
@@ -38,8 +39,7 @@ function ProcessCard({process}) {
         // set loading state
         const wasHtml = e.target.innerHTML;
 
-        e.target.innerHTML =
-            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        e.target.innerHTML = loadingSpinner();
 
         setTimeout(() => {
             api.mbCallback();
@@ -72,8 +72,7 @@ function ProcessCard({process}) {
         e.target.disabled = true; // set loading state
         // set loading state
         const wasHtml = e.target.innerHTML;
-        e.target.innerHTML =
-            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        e.target.innerHTML = loadingSpinner();
 
         setTimeout(() => {
             api.mbCallback();

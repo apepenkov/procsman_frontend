@@ -369,7 +369,8 @@ class ApiResponse {
         apiResponse.status = response.status;
 
         apiResponse.response = response;
-        if (consume) {
+        // if request is non-consume, it will still be consumed if it's an error
+        if (consume || response.status >= 400) {
             if (
                 (response.headers.get('Content-Type') || '')
                     .toLowerCase()
@@ -412,6 +413,17 @@ class ApiResponse {
         }
         return null;
     }
+}
+
+const defaultApiConfig = {
+    showPopup: true,
+    raise_for_status: true,
+    do_throw: false,
+    consume: true, // if request is non-consume, it will still be consumed if it's an error
+}
+
+const configPopupAndThrow = {
+    ...defaultApiConfig, do_throw: true
 }
 
 class ApiInterface {
@@ -485,12 +497,9 @@ class ApiInterface {
     async request(
         method,
         path,
-        json,
-        showPopup = true,
-        raise_for_status = true,
-        do_throw = false,
+        requestConfig = defaultApiConfig,
+        json = null,
         params = null,
-        consume = true
     ) {
         if (json === undefined) {
             json = null;
@@ -524,22 +533,23 @@ class ApiInterface {
             });
         } catch (e) {
             console.log('Error making request: ' + e);
-            showPopup &&
+            requestConfig.showPopup &&
             this.showPopUp(this.loc('error_making_request') + e.toString());
-            if (do_throw) {
+            if (requestConfig.do_throw) {
                 throw new Error(e);
             } else {
                 return null;
             }
         }
+
         let apiResponse;
         try {
-            apiResponse = await ApiResponse.create(response, consume);
+            apiResponse = await ApiResponse.create(response, requestConfig.consume);
         } catch (e) {
             console.error('Error creating ApiResponse:', e);
-            showPopup &&
+            requestConfig.showPopup &&
             this.showPopUp(this.loc('error_making_request') + e.toString());
-            if (do_throw) {
+            if (requestConfig.do_throw) {
                 throw new Error(e);
             } else {
                 return null;
@@ -547,19 +557,19 @@ class ApiInterface {
         }
 
         if (
-            !raise_for_status ||
+            !requestConfig.raise_for_status ||
             (200 <= response.status && response.status < 400)
         ) {
             return apiResponse;
         } else {
             try {
-                showPopup && this.showPopUp(apiResponse.asApiError().withDetails());
+                requestConfig.showPopup && this.showPopUp(apiResponse.asApiError().withDetails());
             } catch (e) {
-                showPopup &&
+                requestConfig.showPopup &&
                 this.showPopUp(this.loc('unknown_error') + apiResponse.text);
             }
 
-            if (do_throw) {
+            if (requestConfig.do_throw) {
                 if (apiResponse.isErr() && apiResponse.asApiError() !== null) {
                     throw apiResponse.asApiError();
                 } else {
@@ -570,7 +580,7 @@ class ApiInterface {
     }
 
     async checkAuth() {
-        let res = await this.request('GET', '/check_auth', null, true, false);
+        let res = await this.request('GET', '/check_auth', {...defaultApiConfig, raise_for_status: false});
         if (res === null) {
             return null;
         }
@@ -589,7 +599,7 @@ class ApiInterface {
     }
 
     async getProcesses() {
-        let res = await this.request('GET', '/processes', null, true, true);
+        let res = await this.request('GET', '/processes');
         if (res === null) {
             return null;
         }
@@ -597,7 +607,7 @@ class ApiInterface {
     }
 
     async getGroups() {
-        let res = await this.request('GET', '/groups', null, true, true);
+        let res = await this.request('GET', '/groups');
         if (res === null) {
             return null;
         }
@@ -689,9 +699,8 @@ class ApiInterface {
             const res = await this.request(
                 'POST',
                 '/processes',
+                configPopupAndThrow,
                 processData,
-                true,
-                true
             );
             await this.mbCallback();
             return res;
@@ -702,7 +711,7 @@ class ApiInterface {
 
     async createGroup(groupData) {
         try {
-            const res = await this.request('POST', '/groups', groupData, true, true);
+            const res = await this.request('POST', '/groups', configPopupAndThrow, groupData);
             await this.mbCallback();
             return res;
         } catch (e) {
@@ -714,10 +723,7 @@ class ApiInterface {
         try {
             const res = await this.request(
                 'POST',
-                '/processes/by_id/' + processId + '/start',
-                null,
-                true,
-                true
+                '/processes/by_id/' + processId + '/start', configPopupAndThrow
             );
             await this.mbCallback();
             return res;
@@ -730,10 +736,7 @@ class ApiInterface {
         try {
             const res = await this.request(
                 'POST',
-                '/processes/by_id/' + processId + '/stop',
-                null,
-                true,
-                true
+                '/processes/by_id/' + processId + '/stop', configPopupAndThrow
             );
             await this.mbCallback();
             return res;
@@ -746,10 +749,7 @@ class ApiInterface {
         try {
             const res = await this.request(
                 'POST',
-                '/processes/by_id/' + processId + '/restart',
-                null,
-                true,
-                true
+                '/processes/by_id/' + processId + '/restart', configPopupAndThrow
             );
             await this.mbCallback();
             return res;
@@ -768,17 +768,13 @@ class ApiInterface {
             params.to = to.toISOString();
         }
         try {
-            const res = await this.request(
+            return await this.request(
                 'GET',
                 url,
+                configPopupAndThrow,
                 null,
-                true,
-                true,
-                false,
                 params
-
             );
-            return res;
         } catch (e) {
             return null;
         }
@@ -795,16 +791,13 @@ class ApiInterface {
         }
         params.limit = limit;
         try {
-            const res = await this.request(
+            return await this.request(
                 'GET',
                 url,
+                configPopupAndThrow,
                 null,
-                true,
-                true,
-                false,
                 params
             );
-            return res;
         } catch (e) {
             return null;
         }
@@ -815,9 +808,7 @@ class ApiInterface {
             const res = await this.request(
                 'GET',
                 '/default_config',
-                null,
-                true,
-                true
+                configPopupAndThrow
             );
             defaultSeverConfiguration.clear()
             for (const [key, value] of Object.entries(res.json)) {
@@ -882,16 +873,13 @@ class ApiInterface {
             params.to = to.toISOString();
         }
         try {
-            const res = await this.request(
+            return await this.request(
                 'GET',
                 url,
+                configPopupAndThrow,
                 null,
-                true,
-                true,
-                false,
                 params
             );
-            return res;
         } catch (e) {
             return null;
         }
@@ -899,16 +887,14 @@ class ApiInterface {
 
     async putStdin(processId, data) {
         try {
-            const res = await this.request(
+            return await this.request(
                 'PUT',
                 '/processes/by_id/' + processId + '/stdin',
+                configPopupAndThrow,
                 {
                     text: data
                 },
-                true,
-                true
             );
-            return res;
         } catch (e) {
             return null;
         }
@@ -924,17 +910,13 @@ class ApiInterface {
             params.to = to.toISOString();
         }
         try {
-            const res = await this.request(
+            return await this.request(
                 'GET',
                 url,
+                {...configPopupAndThrow, consume: false},
                 null,
-                true,
-                true,
-                false,
                 params,
-                false
             );
-            return res;
         } catch (e) {
             return null;
         }
@@ -945,9 +927,8 @@ class ApiInterface {
             const res = await this.request(
                 'PATCH',
                 '/processes/by_id/' + processId,
+                configPopupAndThrow,
                 processData,
-                true,
-                true
             );
             await this.mbCallback();
             return res;

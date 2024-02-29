@@ -8,7 +8,16 @@ import api from '../api';
 import Form from "react-bootstrap/Form";
 import Convert from "ansi-to-html";
 import './logs.css';
-import {Fullscreen, FullscreenExit, Download, ArrowClockwise, ArrowLeft, ArrowRight, Upload} from 'react-bootstrap-icons';
+import {
+    Fullscreen,
+    FullscreenExit,
+    Download,
+    ArrowClockwise,
+    ArrowLeft,
+    ArrowRight,
+    Upload
+} from 'react-bootstrap-icons';
+import loadingSpinner from "../loadingSpinner";
 
 const convert = new Convert();
 
@@ -29,6 +38,10 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
     const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
     const [totalMatches, setTotalMatches] = useState(0);
     const [processedLogs, setProcessedLogs] = useState({__html: ''});
+
+    const [logsLoading, setLogsLoading] = useState(false);
+    const [logsDownloadLoading, setLogsDownloadLoading] = useState(false);
+    const [sendingStdIn, setSendingStdIn] = useState(false);
 
 
     function toLocalISOString(date) {
@@ -70,7 +83,10 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
 
     useEffect(() => {
         if (showDetails && selectedTab === 'logs') {
-            loadLogs();
+            setLogsLoading(true);
+            loadLogs().finally(() => {
+                setLogsLoading(false);
+            });
         }
     }, [showDetails, selectedTab]);
 
@@ -114,8 +130,6 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
     }, [searchText, caseSensitive, useRegex, currentMatchIndex, convertedLogs]);
 
 
-
-
     useEffect(() => {
         if (!searchText) {
             setTotalMatches(0);
@@ -127,7 +141,9 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
         let searchRegex;
         try {
             searchRegex = useRegex ? new RegExp(searchText, flags) : new RegExp(searchText.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), flags);
-        } catch (e) { return; }
+        } catch (e) {
+            return;
+        }
         let matchCount = 0;
         let isFirst = true;
         convertedLogs.split('\n').forEach((line) => {
@@ -170,22 +186,21 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
         }} value={stdIn}/>
         <Button style={{marginTop: '1rem'}} onClick={
             event => {
-                const wasHtml = event.target.innerHTML;
-                event.target.disabled = true;
-                event.target.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-
+                setSendingStdIn(true);
                 api.putStdin(process.id, stdIn).then((res) => {
                     if (res !== null) {
                         setStdIn('')
                     }
                 }).finally(() => {
-                    event.target.disabled = false;
-                    event.target.innerHTML = wasHtml;
+                    setSendingStdIn(false);
                 });
             }
-        }>
-            <Upload style={{marginBottom: '4px'}}></Upload>
-            Send to stdin
+        }
+                disabled={sendingStdIn}
+        >
+            {sendingStdIn ? loadingSpinner() :
+                <div><Upload style={{marginBottom: '4px'}}></Upload> Send to stdin</div>}
+
         </Button>
 
         <hr style={{margin: '30px 0'}}/>
@@ -194,33 +209,25 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
             <ButtonGroup>
                 <Button
                     onClick={(e) => {
-                        e.target.disabled = true;
-                        // set spinner
-                        const wasHtml = e.target.innerHTML;
-                        e.target.innerHTML =
-                            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-
-                        loadLogs().then(() => {
-
-                        }).finally(() => {
-                            e.target.disabled = false;
-                            e.target.innerHTML = wasHtml;
+                        setLogsLoading(true);
+                        loadLogs().finally(() => {
+                            setLogsLoading(false);
                         });
                     }}
+                    id="loadLogsButton"
+                    disabled={logsLoading}
                 >
-                    <ArrowClockwise></ArrowClockwise>
-                    Load logs
+                    {logsLoading ? loadingSpinner() :
+                        <div><ArrowClockwise style={{marginBottom: '4px'}}></ArrowClockwise> Reload logs</div>}
                 </Button>
                 <Button
                     variant={'info'}
                     onClick={(e) => {
-                        e.target.disabled = true;
-                        // set spinner
-                        const wasHtml = e.target.innerHTML;
-                        e.target.innerHTML =
-                            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-
+                        setLogsDownloadLoading(true);
                         api.downloadLogsZipFile(process.id, dateTimeFrom, dateTimeTo).then((resp) => {
+                            if (resp === undefined || resp === null) {
+                                return;
+                            }
                             resp.response.blob().then(blob => {
                                 const link = document.createElement('a');
                                 link.href = window.URL.createObjectURL(blob);  // Create an object URL for the blob
@@ -233,13 +240,14 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                                 window.URL.revokeObjectURL(link.href);
                             })
                         }).finally(() => {
-                            e.target.disabled = false;
-                            e.target.innerHTML = wasHtml;
+                            setLogsDownloadLoading(false);
                         });
                     }}
+
+                    disabled={logsDownloadLoading}
                 >
-                    <Download style={{marginBottom: '4px'}}></Download>
-                    Download logs
+                    {logsDownloadLoading ? loadingSpinner() :
+                        <div><Download style={{marginBottom: '4px'}}></Download> Download logs</div>}
                 </Button>
             </ButtonGroup>
 

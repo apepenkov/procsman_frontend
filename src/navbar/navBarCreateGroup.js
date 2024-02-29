@@ -6,6 +6,8 @@ import {
 } from 'react-bootstrap';
 import api, {rgbaToHex} from '../api';
 import {SketchPicker} from 'react-color';
+import {X} from 'react-bootstrap-icons';
+import loadingSpinner from "../loadingSpinner";
 
 const NewGroupModal = ({show, handleClose, groups}) => {
 
@@ -52,6 +54,8 @@ const NewGroupModal = ({show, handleClose, groups}) => {
     const [recordStats, setRecordStats] = useState(api.getConfiguration('record_stats'));
     const [storeLogs, setStoreLogs] = useState(api.getConfiguration('store_logs'));
 
+    const [creatingGroup, setCreatingGroup] = useState(false);
+
     const CreateGroup = () => {
         const NewGroupParams = {
             name: newGroupName,
@@ -75,10 +79,7 @@ const NewGroupModal = ({show, handleClose, groups}) => {
         }
         setFormErrors({});
         console.log(NewGroupParams);
-        const elem = document.getElementById('createGroupBtn');
-        const wasHtml = elem.innerHTML;
-        elem.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-        elem.disabled = true;
+        setCreatingGroup(true);
         api.createGroup(NewGroupParams).then((r) => {
             if (r !== null && r !== undefined && !r.isErr()) {
                 handleClose('createGroup')();
@@ -89,8 +90,7 @@ const NewGroupModal = ({show, handleClose, groups}) => {
             }
         }).finally(
             () => {
-                elem.innerHTML = wasHtml;
-                elem.disabled = false;
+                setCreatingGroup(false);
             }
         );
     };
@@ -283,8 +283,12 @@ const NewGroupModal = ({show, handleClose, groups}) => {
             <Button variant='secondary' onClick={handleClose('createGroup')}>
                 Close
             </Button>
-            <Button variant='primary' onClick={CreateGroup} disabled={Object.keys(formErrors).length > 0} id='createGroupBtn'>
-                Create
+            <Button variant='primary' onClick={CreateGroup} disabled={Object.keys(formErrors).length > 0 || creatingGroup}>
+                {creatingGroup ? loadingSpinner() : <div>
+                    <X style={{fontSize: '1.5rem', rotate: '45deg'}}/>
+                    Create
+                </div>}
+
             </Button>
         </Modal.Footer>
     </Modal>
