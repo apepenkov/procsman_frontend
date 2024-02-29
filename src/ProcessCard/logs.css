@@ -1,59 +1,60 @@
 .log-container {
-  counter-reset: line;
-  font-family: monospace;
-  overflow: auto;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 1rem 1rem 1rem 4rem; /* Increase left padding to accommodate wider line numbers */
-  border-radius: 10px;
-  white-space: pre-wrap;
+    counter-reset: line;
+    font-family: monospace;
+    overflow: auto;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 1rem 1rem 1rem 4rem; /* Increase left padding to accommodate wider line numbers */
+    border-radius: 10px;
+    white-space: pre-wrap;
 }
 
 .log-container.collapsed {
-  height: 30em; /* Adjust based on your preference */
+    height: 30em; /* Adjust based on your preference */
 }
 
 .log-container.full {
-  height: auto;
-  min-height: 100vh; /* Adjust based on your preference */
+    height: auto;
+    min-height: 100vh; /* Adjust based on your preference */
 }
 
 .log-line {
-  counter-increment: line;
-  position: relative;
-  min-height: 1.5em; /* Ensure line has height even if empty */
-  display: block; /* Makes sure the line is treated as a block, preserving space */
+    counter-increment: line;
+    position: relative;
+    min-height: 1.5em; /* Ensure line has height even if empty */
+    display: block; /* Makes sure the line is treated as a block, preserving space */
 }
 
 .log-line::before {
-  content: counter(line);
-  position: absolute;
-  left: -50px; /* Adjust based on your layout */
-  width: 45px; /* Adjust the width as needed */
-  text-align: right;
-  color: #888; /* Line number color */
-  background: rgba(
-    0,
-    0,
-    0,
-    0.1
-  ); /* Ensure background matches log-container for seamless integration */
-  border-right: 1px solid #ddd;
-  padding-right: 10px; /* Ensures a gap between line numbers and log text */
-  line-height: 1.2em; /* Aligns with the log line height */
-  border-radius: 10px 0 0 10px; /* Adjust based on your preference */
+    content: counter(line);
+    position: absolute;
+    left: -50px; /* Adjust based on your layout */
+    width: 45px; /* Adjust the width as needed */
+    text-align: right;
+    color: #888; /* Line number color */
+    background: rgba(
+            0,
+            0,
+            0,
+            0.1
+    ); /* Ensure background matches log-container for seamless integration */
+    border-right: 1px solid #ddd;
+    padding-right: 10px; /* Ensures a gap between line numbers and log text */
+    line-height: 1.2em; /* Aligns with the log line height */
+    border-radius: 10px 0 0 10px; /* Adjust based on your preference */
 }
 
 .log-line:nth-child(odd) {
-  background-color: #f2f2f2;
+    background-color: #f2f2f2;
 }
 
 .log-line:nth-child(even) {
-  background-color: #e6e6e6;
+    background-color: #e6e6e6;
 }
 
 .highlight {
-  background-color: yellow; /* Change color as needed */
+    background-color: yellow; /* Change color as needed */
 }
+
 .current-highlight {
-  background-color: orange; /* Or any other color */
+    background-color: orange; /* Or any other color */
 }
