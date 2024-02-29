@@ -53,7 +53,9 @@ function Dashboard({ switchView, view }) {
     };
     fetchData();
     const handleCardsChanged = (newData) => {
-      if (newData === null) {return}
+      if (newData === null) {
+        return;
+      }
       setGroupedProcesses((prevData) => {
         const updatedProcesses = newData.processes.map((newProcessData) => {
           const existingProcess = prevData.processes.find(
