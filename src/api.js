@@ -640,7 +640,7 @@ const configPopupAndThrow = {
 
 class ApiInterface {
     constructor() {
-        this.url = 'http://localhost:54580';
+        this.url = process.env.REACT_APP_API_ENDPOINT;
         this.localeKey = window.localStorage.getItem('locale') || 'en';
         this.authToken = window.localStorage.getItem('authToken');
         this.popUpCallback = null;
