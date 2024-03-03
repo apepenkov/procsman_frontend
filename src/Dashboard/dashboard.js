@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Card, Col, Container, Row, Tab, Tabs} from 'react-bootstrap';
+import {Card, Col, Container, Modal, Row, Tab, Tabs} from 'react-bootstrap';
 import ProcessCard from '../ProcessCard/processcard';
 import NavBarHeader from '../navbar/navbar';
 import api, {GroupInfo, ProcessInfo} from '../api';
 import './dashboard.css';
+import {Gear} from "react-bootstrap-icons";
+import EditGroup from "./editGroup";
 
 const SkeletonCard = () => {
     return (
@@ -40,6 +42,7 @@ function Dashboard({switchView, view}) {
     });
     const [selectedTab, setSelectedTab] = useState('all');
     const [isLoading, setIsLoading] = useState(false);
+    const [showEditGroup, setShowEditGroup] = useState(null);
 
     const rowClasses = 'd-flex justify-content-center';
 
@@ -56,6 +59,11 @@ function Dashboard({switchView, view}) {
             if (newData === null) {
                 return;
             }
+            // if new data is the same as the old data, do nothing.
+            if (JSON.stringify(newData) === JSON.stringify(groupedProcesses)) {
+                return;
+            }
+
             setGroupedProcesses((prevData) => {
                 const updatedProcesses = newData.processes.map((newProcessData) => {
                     const existingProcess = prevData.processes.find(
@@ -181,7 +189,19 @@ function Dashboard({switchView, view}) {
                         )}
                     </Tab>
                     {Object.entries(groupedProcesses.groups).map(([groupId, group]) => (
-                        <Tab eventKey={groupId} title={group.name} key={groupId}>
+                        <Tab eventKey={groupId} title={
+                            // group.name
+                            selectedTab === groupId ? (
+                                <div onClick={() => {setShowEditGroup(group.id)}}>
+                                    {group.name}
+                                    <Gear style={{marginLeft: '5px', marginBottom: '4px'}}></Gear>
+                                </div>
+                            ) : (
+                                group.name
+                            )
+                        } key={groupId}>
+                            <EditGroup showEditGroup={showEditGroup} setShowEditGroup={setShowEditGroup} group={group}/>
+
                             <Row className={rowClasses}>
                                 {renderGroupedProcessCards(groupId)}
                             </Row>

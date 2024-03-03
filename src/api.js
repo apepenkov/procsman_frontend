@@ -749,6 +749,20 @@ class ApiInterface {
         }
     }
 
+    async editGroup(groupId, groupData) {
+        try {
+            const res = await this.request(
+                'PATCH',
+                '/groups/by_id/' + groupId,
+                configPopupAndThrow,
+                groupData
+            );
+            await this.mbCallback();
+            return res;
+        } catch (e) {
+            return null;
+        }
+    }
     async startProcess(processId) {
         try {
             const res = await this.request(

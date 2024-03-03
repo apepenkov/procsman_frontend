@@ -3,7 +3,6 @@ import {useEffect, useState} from 'react';
 import Auth from './Authorization/auth';
 import api from './api';
 import Dashboard from './Dashboard/dashboard';
-import Groups from './Groups/Groups';
 
 function Loading() {
     return (
@@ -38,7 +37,6 @@ function App() {
             {view === 'loading' && <Loading/>}
             {view === 'auth' && <Auth switchView={setView}/>}
             {view === 'dashboard' && <Dashboard switchView={setView} view={view}/>}
-            {view === 'groups' && <Groups switchView={setView} view={view}/>}
         </div>
     );
 }

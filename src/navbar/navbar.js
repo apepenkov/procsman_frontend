@@ -15,9 +15,18 @@ function NavBarHeader({switchView, view}) {
 
     const [groups, setGroups] = useState([]);
 
+    const [prevData, setPrevData] = useState(null);
+
     useEffect(() => {
         const fetchGroups = async () => {
             const data = await api.getGroupedProcesses(true);
+            // if it's the same, don't update
+
+            if (JSON.stringify(data) === prevData) {
+                return;
+            }
+            setPrevData(JSON.stringify(data));
+
             setGroups(Object.values(data.groups));
         };
         fetchGroups();
@@ -157,13 +166,6 @@ function NavBarHeader({switchView, view}) {
                             onClick={() => switchView('dashboard')}
                         >
                             Dashboard
-                        </Nav.Link>
-                        <Nav.Link
-                            href='#groups'
-                            style={view === 'groups' ? activeTabStyle : {}}
-                            onClick={() => switchView('groups')}
-                        >
-                            Groups
                         </Nav.Link>
                     </Nav>
                     <Nav className='nav-icon-container'>
