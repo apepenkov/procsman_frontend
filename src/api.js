@@ -20,6 +20,10 @@ const locales = {
             internal_error: 'Internal error',
             could_not_create_group: 'Could not create group',
             group_not_found: 'Group not found',
+            executable_not_executable: "Executable isn't executable",
+            invalid_time_frame: 'Invalid time frame',
+            invalid_limit: 'Invalid limit',
+            text_required: 'Text required',
         },
         validators: {
             auto_restart_max_retries_invalid: 'Auto restart max retries invalid: must be an integer greater than 0 and less than 100',
@@ -148,7 +152,11 @@ const locales = {
             process_not_running: "Процесс не запущен",
             internal_error: "Внутренняя ошибка",
             could_not_create_group: "Не удалось создать группу",
-            group_not_found: "Группа не найдена"
+            group_not_found: "Группа не найдена",
+            executable_not_executable: "Исполняемый файл не является исполняемым",
+            invalid_time_frame: "Неверный временной промежуток",
+            invalid_limit: "Неверный лимит",
+            text_required: "Требуется текст"
         },
         validators: {
             auto_restart_max_retries_invalid: "Максимальное количество попыток перезапуска недопустимо: должно быть целым числом больше 0 и меньше 100",

@@ -91,7 +91,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                 setLogsLoading(false);
             });
         }
-    }, [showDetails, selectedTab, loadLogs]);
+    }, [showDetails, selectedTab]);
 
     useEffect(() => {
         if (!searchText) {
