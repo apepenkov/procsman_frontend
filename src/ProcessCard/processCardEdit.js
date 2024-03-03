@@ -748,11 +748,13 @@ function ProcessCardEdit({
             {/*    />*/}
             {/*</Form.Group>*/}
 
+            {/*stick to right*/}
             <Button
                 id='updateProcessBtn'
                 onClick={() => editProcess(true)}
                 disabled={updatingProcess}
                 variant={'success'}
+                style={{float: 'right'}}
             >
                 {updatingProcess ? (
                     LoadingSpinner()

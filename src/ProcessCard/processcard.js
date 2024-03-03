@@ -103,9 +103,12 @@ function ProcessCard({process}) {
                         <Pin onClick={handlePinClick}/>
                     )}
                 </div>
-                <Card.Title style={{minHeight: '3em', paddingRight: '20px'}}>
-                    {process.name}
-                </Card.Title>
+                <OverlayTrigger overlay={process.name.length > 20 ? <Tooltip>{process.name}</Tooltip> : <div></div>}>
+                    <Card.Title style={{minHeight: '3em', paddingRight: '20px'}}>
+                        {process.name.length > 20 ? process.name.substring(0, 20) + '...' : process.name}
+                    </Card.Title>
+                </OverlayTrigger>
+
                 <Card.Subtitle
                     className='mb-2 text-muted d-flex justify-content-center'
                     style={{minHeight: '1em'}}
@@ -122,9 +125,10 @@ function ProcessCard({process}) {
                     >
             <span style={{color: process.enabled ? 'green' : 'red'}}>
               {' '}
-                {process.enabled ? ' '+api.loc("enabled") : ' '+api.loc("disabled")}
+                {process.enabled ? ' ' + api.loc("enabled") : ' ' + api.loc("disabled")}
             </span>
-                        <span style={{fontWeight: 'bold'}}>{' | '}</span>
+                        <span style={{fontWeight: 'bold'}}></span>
+                        <br/>
                         <span
                             style={{
                                 color: process.statusColor(),

@@ -452,7 +452,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                 </div>
 
                 <div
-                    className={`log-container ${isFull ? api.loc("full") : api.loc('collapsed')}`}
+                    className={`log-container ${isFull ? "full" : "collapsed"}`}
                     dangerouslySetInnerHTML={processedLogs}
                 ></div>
             </Container>

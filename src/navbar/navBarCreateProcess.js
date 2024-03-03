@@ -261,7 +261,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     }
                 })
                 .finally(() => {
-                    setSavingProcess(true);
+                    setSavingProcess(false);
                 });
         }
     };
