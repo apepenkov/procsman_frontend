@@ -24,7 +24,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prod": "serve -s build -l tcp://127.0.0.1:17466"
   },
   "eslintConfig": {
     "extends": [

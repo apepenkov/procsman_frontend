@@ -640,8 +640,7 @@ const configPopupAndThrow = {
 
 class ApiInterface {
     constructor() {
-        // this.url = 'http://apepenkov-pc.lan:25812';
-        this.url = 'http://localhost:25812';
+        this.url = 'http://localhost:54580';
         this.localeKey = window.localStorage.getItem('locale') || 'en';
         this.authToken = window.localStorage.getItem('authToken');
         this.popUpCallback = null;
