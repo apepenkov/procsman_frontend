@@ -14,6 +14,7 @@ function Auth({switchView}) {
             console.log(`Logged in: ${loggedIn}`);
             if (loggedIn === true) {
                 switchView('dashboard');
+                api.fetchDefaultConfiguration();
             } else {
                 document.getElementById('login-password').value = '';
                 if (loggedIn !== null) {

@@ -3,7 +3,7 @@ import {Button, Form, Modal, Table} from 'react-bootstrap';
 import {X} from 'react-bootstrap-icons'; // Importing icons
 import api, {rgbaToHex} from '../api';
 import {SketchPicker} from 'react-color';
-import loadingSpinner from '../loadingSpinner';
+import LoadingSpinner from '../loadingSpinner';
 
 const NewProcessModal = ({show, handleClose, groups}) => {
     const [processColor, setProcessColor] = useState({
@@ -681,7 +681,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     disabled={Object.keys(formErrors).length > 0 || savingProcess}
                 >
                     {savingProcess ? (
-                        loadingSpinner()
+                        LoadingSpinner()
                     ) : (
                         <div>
                             <X style={{fontSize: '1.5rem', rotate: '45deg'}}/> Create

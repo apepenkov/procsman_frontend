@@ -13,7 +13,8 @@ import {
     TooltipComponent,
 } from 'echarts/components';
 import {CanvasRenderer} from 'echarts/renderers';
-import loadingSpinner from '../loadingSpinner';
+import LoadingSpinner from '../loadingSpinner';
+import {ArrowClockwise} from "react-bootstrap-icons";
 
 // Register the required components
 echarts.use([
@@ -37,6 +38,7 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
 
     const [events, setEvents] = useState([]); // State to hold events data
     const [loadingEvents, setLoadingEvents] = useState(false); // State to manage loading indicator for events
+    const [refreshingGraphs, setRefreshingGraphs] = useState(false);
 
     function normalizeDataPoints(data, labels) {
         return {normalizedData: data, normalizedLabels: labels};
@@ -211,18 +213,15 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
     };
 
     const refreshAndSetEventsData = async () => {
-        setLoadingEvents(true); // Start loading
-        try {
-            const res = await api.getProcessEvents(process.id);
-            if (res !== undefined) {
-                // Assuming the API response structure has an array of events
-                setEvents(res.json.events || []); // Update state with fetched events
+        setLoadingEvents(true);
+        api.getProcessEvents(process.id).then((res) => {
+                if (res !== undefined) {
+                    setEvents(res.json.events || []); // Update state with fetched events
+                }
             }
-        } catch (error) {
-            console.error('Failed to fetch process events:', error);
-        } finally {
-            setLoadingEvents(false); // End loading
-        }
+        ).finally(() => {
+            setLoadingEvents(false);
+        })
     };
 
     const refreshAndSetData = async () => {
@@ -277,26 +276,30 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
         // You might need to adjust dependencies based on your data fetching and updating logic
     }, [showDetails, selectedTab, cpuChartData, ramChartData]);
 
+
     return (
         <Container>
             <div className='d-flex justify-content-end'>
                 <Button
                     onClick={(e) => {
-                        e.target.disabled = true;
-                        // set spinner
-                        const wasHtml = e.target.innerHTML;
-                        e.target.innerHTML = loadingSpinner();
+                        setRefreshingGraphs(true);
 
-                        refreshAndSetStatsData()
-                            .then(() => {
-                            })
-                            .finally(() => {
-                                e.target.disabled = false;
-                                e.target.innerHTML = wasHtml;
-                            });
+                        refreshAndSetStatsData().finally(() => {
+                            setRefreshingGraphs(false);
+                        });
                     }}
+                    disabled={refreshingGraphs}
                 >
-                    Refresh
+                    {refreshingGraphs ? (
+                        LoadingSpinner()
+                    ) : (
+                        <div>
+                            <ArrowClockwise
+                                style={{marginBottom: '4px'}}
+                            ></ArrowClockwise>{' '}
+                            Refresh
+                        </div>
+                    )}
                 </Button>
             </div>
             <div className='normalization-controls'>
@@ -362,7 +365,7 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
             <div>
                 <h3>Events (last 30): </h3>
                 <Button onClick={refreshAndSetEventsData} disabled={loadingEvents}>
-                    {loadingEvents ? 'Refreshing...' : 'Refresh Events'}
+                    {loadingEvents ? LoadingSpinner() : 'Refresh Events'}
                 </Button>
                 {renderEventsTable()}
             </div>

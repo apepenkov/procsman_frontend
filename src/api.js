@@ -603,6 +603,7 @@ class ApiInterface {
         let res = await this.request('GET', '/check_auth', {
             ...defaultApiConfig,
             raise_for_status: false,
+            showPopup: false,
         });
         if (res === null) {
             return null;
@@ -827,7 +828,11 @@ class ApiInterface {
             const res = await this.request(
                 'GET',
                 '/default_config',
-                configPopupAndThrow
+                {
+                    ...defaultApiConfig,
+                    raise_for_status: false,
+                    showPopup: false,
+                }
             );
             defaultSeverConfiguration.clear();
             for (const [key, value] of Object.entries(res.json)) {

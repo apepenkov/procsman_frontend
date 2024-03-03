@@ -1,6 +1,6 @@
 import React from 'react';
 
-function loadingSpinner() {
+function LoadingSpinner() {
     return (
         <span
             className='spinner-border spinner-border-sm'
@@ -10,4 +10,4 @@ function loadingSpinner() {
     );
 }
 
-export default loadingSpinner;
+export default LoadingSpinner;

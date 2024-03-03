@@ -3,7 +3,7 @@ import {Button, Form, Modal} from 'react-bootstrap';
 import api, {rgbaToHex} from '../api';
 import {SketchPicker} from 'react-color';
 import {X} from 'react-bootstrap-icons';
-import loadingSpinner from '../loadingSpinner';
+import LoadingSpinner from '../loadingSpinner';
 
 const NewGroupModal = ({show, handleClose, groups}) => {
     const [newGroupColor, setNewGroupColor] = useState({
@@ -323,7 +323,7 @@ const NewGroupModal = ({show, handleClose, groups}) => {
                     disabled={Object.keys(formErrors).length > 0 || creatingGroup}
                 >
                     {creatingGroup ? (
-                        loadingSpinner()
+                        LoadingSpinner()
                     ) : (
                         <div>
                             <X style={{fontSize: '1.5rem', rotate: '45deg'}}/>

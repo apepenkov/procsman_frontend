@@ -3,7 +3,7 @@ import {Button, Container, Form, Table} from 'react-bootstrap';
 import {Pencil, X} from 'react-bootstrap-icons'; // Importing icons
 import {SketchPicker} from 'react-color';
 import api, {hexToRgba, rgbaToHex} from '../api';
-import loadingSpinner from '../loadingSpinner';
+import LoadingSpinner from '../loadingSpinner';
 
 function ProcessCardEdit({
                              process,
@@ -13,14 +13,15 @@ function ProcessCardEdit({
                          }) {
     const [groups, setGroups] = useState([]);
 
-    useEffect(() => {
-        const fetchGroups = async () => {
-            const data = await api.getGroupedProcesses(true);
-            setGroups(Object.values(data.groups));
-        };
-        fetchGroups();
+    const fetchGroups = async () => {
+        const data = await api.getGroupedProcesses(true);
+        setGroups(Object.values(data.groups));
+    };
 
+    useEffect(() => {
         api.setGroupsChangedProcessEditCallback(handleGroupsChanged);
+
+        fetchGroups();
 
         return () => {
             api.setGroupsChangedProcessEditCallback(null);
@@ -108,36 +109,36 @@ function ProcessCardEdit({
 
     // configuration
     const [autoRestartOnStop, setAutoRestartOnStop] = useState(
-        api.getConfiguration('auto_auto_restart_on_stop')
+        process.getConfiguration('auto_auto_restart_on_stop')
     );
     const [autoRestartOnCrash, setAutoRestartOnCrash] = useState(
-        api.getConfiguration('auto_auto_restart_on_crash')
+        process.getConfiguration('auto_auto_restart_on_crash')
     );
     const [autoRestartMaxRetries, setAutoRestartMaxRetries] = useState(
-        api.getConfiguration('auto_restart_max_retries')
+        process.getConfiguration('auto_restart_max_retries')
     );
     const [autoRestartMaxRetriesFrame, setAutoRestartMaxRetriesFrame] = useState(
-        api.getConfiguration('auto_restart_max_retries_frame')
+        process.getConfiguration('auto_restart_max_retries_frame')
     );
     const [autoRestartDelay, setAutoRestartDelay] = useState(
-        api.getConfiguration('auto_restart_delay')
+        process.getConfiguration('auto_restart_delay')
     );
     const [notifyOnCrash, setNotifyOnCrash] = useState(
-        api.getConfiguration('notify_on_crash')
+        process.getConfiguration('notify_on_crash')
     );
     const [notifyOnStop, setNotifyOnStop] = useState(
-        api.getConfiguration('notify_on_stop')
+        process.getConfiguration('notify_on_stop')
     );
     const [notifyOnStart, setNotifyOnStart] = useState(
-        api.getConfiguration('notify_on_start')
+        process.getConfiguration('notify_on_start')
     );
 
     // UNUSED
     const [recordStats, setRecordStats] = useState(
-        api.getConfiguration('record_stats')
+        process.getConfiguration('record_stats')
     );
     const [storeLogs, setStoreLogs] = useState(
-        api.getConfiguration('store_logs')
+        process.getConfiguration('store_logs')
     );
 
     const [updatingProcess, setUpdatingProcess] = useState(false);
@@ -169,10 +170,12 @@ function ProcessCardEdit({
         for (const key in process.environment) {
             newEnvVars.push({key: key, value: process.environment[key]});
         }
+        // TODO: correctly set current group
         setEnvVars(newEnvVars);
+        api.mbCallback(true);
 
         setProcessName(process.name);
-        setSelectedGroupId(process.group_id);
+        setSelectedGroupId(process.process_group_id);
         setProcessName(process.name);
         setExecutablePath(process.executable_path);
         setWorkingDirectory(process.working_directory);
@@ -460,31 +463,31 @@ function ProcessCardEdit({
                 <Form.Label>Group</Form.Label>
                 <Form.Control
                     as='select'
-                    value={selectedGroupId || ''}
+                    value={selectedGroupId}
                     onChange={(e) => {
                         const value = e.target.value;
                         setSelectedGroupId(value);
                         if (value !== 'addNew' && value !== null) {
                             setAutoRestartOnStop(
-                                api.getConfiguration('auto_auto_restart_on_stop', value)
+                                process.getConfiguration('auto_auto_restart_on_stop', value)
                             );
                             setAutoRestartOnCrash(
-                                api.getConfiguration('auto_auto_restart_on_crash', value)
+                                process.getConfiguration('auto_auto_restart_on_crash', value)
                             );
                             setAutoRestartMaxRetries(
-                                api.getConfiguration('auto_restart_max_retries', value)
+                                process.getConfiguration('auto_restart_max_retries', value)
                             );
                             setAutoRestartMaxRetriesFrame(
-                                api.getConfiguration('auto_restart_max_retries_frame', value)
+                                process.getConfiguration('auto_restart_max_retries_frame', value)
                             );
                             setAutoRestartDelay(
-                                api.getConfiguration('auto_restart_delay', value)
+                                process.getConfiguration('auto_restart_delay', value)
                             );
-                            setNotifyOnCrash(api.getConfiguration('notify_on_crash', value));
-                            setNotifyOnStop(api.getConfiguration('notify_on_stop', value));
-                            setNotifyOnStart(api.getConfiguration('notify_on_start', value));
-                            setRecordStats(api.getConfiguration('record_stats', value));
-                            setStoreLogs(api.getConfiguration('store_logs', value));
+                            setNotifyOnCrash(process.getConfiguration('notify_on_crash', value));
+                            setNotifyOnStop(process.getConfiguration('notify_on_stop', value));
+                            setNotifyOnStart(process.getConfiguration('notify_on_start', value));
+                            setRecordStats(process.getConfiguration('record_stats', value));
+                            setStoreLogs(process.getConfiguration('store_logs', value));
                         }
                         setDoCreateGroup(value === 'addNew');
                     }}
@@ -740,7 +743,7 @@ function ProcessCardEdit({
                 variant={'success'}
             >
                 {updatingProcess ? (
-                    loadingSpinner()
+                    LoadingSpinner()
                 ) : (
                     <div>
                         <Pencil style={{marginBottom: '2px'}}/> Save

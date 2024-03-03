@@ -13,7 +13,7 @@ import {
   FullscreenExit,
   Upload,
 } from 'react-bootstrap-icons';
-import loadingSpinner from '../loadingSpinner';
+import LoadingSpinner from '../loadingSpinner';
 
 const convert = new Convert();
 
@@ -234,7 +234,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                 disabled={sendingStdIn}
             >
                 {sendingStdIn ? (
-                    loadingSpinner()
+                    LoadingSpinner()
                 ) : (
                     <div>
                         <Upload style={{marginBottom: '4px'}}></Upload> Send to stdin
@@ -257,7 +257,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                         disabled={logsLoading}
                     >
                         {logsLoading ? (
-                            loadingSpinner()
+                            LoadingSpinner()
                         ) : (
                             <div>
                                 <ArrowClockwise
@@ -296,7 +296,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                         disabled={logsDownloadLoading}
                     >
                         {logsDownloadLoading ? (
-                            loadingSpinner()
+                            LoadingSpinner()
                         ) : (
                             <div>
                                 <Download style={{marginBottom: '4px'}}></Download> Download
