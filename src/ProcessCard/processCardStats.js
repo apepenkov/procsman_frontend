@@ -232,7 +232,7 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
         if (showDetails && selectedTab === 'status') {
             refreshAndSetData();
         }
-    }, [showDetails, process.id]);
+    }, [showDetails, selectedTab]);
 
     const renderEventsTable = () => {
         return (
