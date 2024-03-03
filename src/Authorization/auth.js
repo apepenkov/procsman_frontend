@@ -11,7 +11,6 @@ function Auth({switchView}) {
     const handleTokenEntry = () => {
         api.authToken = document.getElementById('login-password').value;
         api.checkAuth().then(function (loggedIn) {
-            console.log(`Logged in: ${loggedIn}`);
             if (loggedIn === true) {
                 switchView('dashboard');
                 api.fetchDefaultConfiguration();
@@ -53,7 +52,7 @@ function Auth({switchView}) {
                         onClick={handleTokenEntry}
                         id={'login'}
                     >
-                        Разблокировать
+                        {api.loc('login')}
                     </Button>
                 </Form>
             </Container>

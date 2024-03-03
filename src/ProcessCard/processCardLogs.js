@@ -210,7 +210,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
         <Container>
             <Form.Control
                 as='textarea'
-                placeholder={'> Text to send to stdin'}
+                placeholder={api.loc("text_to_send_to_stdin")}
                 onChange={(e) => {
                     setStdIn(e.target.value);
                 }}
@@ -237,7 +237,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                     LoadingSpinner()
                 ) : (
                     <div>
-                        <Upload style={{marginBottom: '4px'}}></Upload> Send to stdin
+                        <Upload style={{marginBottom: '4px'}}></Upload> {api.loc("send_to_stdin")}
                     </div>
                 )}
             </Button>
@@ -263,7 +263,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                                 <ArrowClockwise
                                     style={{marginBottom: '4px'}}
                                 ></ArrowClockwise>{' '}
-                                Reload logs
+                                {api.loc("refresh_logs")}
                             </div>
                         )}
                     </Button>
@@ -299,15 +299,14 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                             LoadingSpinner()
                         ) : (
                             <div>
-                                <Download style={{marginBottom: '4px'}}></Download> Download
-                                logs
+                                <Download style={{marginBottom: '4px'}}></Download> {api.loc("download_logs")}
                             </div>
                         )}
                     </Button>
                 </ButtonGroup>
 
                 <Form.Group controlId='dateTimeFrom'>
-                    <Form.Label>From</Form.Label>
+                    <Form.Label>{api.loc("from")}</Form.Label>
                     <Form.Control
                         type='datetime-local'
                         value={toLocalISOString(dateTimeFrom)}
@@ -326,11 +325,11 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                         isInvalid={dateTimeFromInvalid}
                     />
                     <Form.Control.Feedback type='invalid'>
-                        Please enter a valid date and time.
+                        {api.loc("please_enter_valid_dt")}
                     </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group controlId='dateTimeTo'>
-                    <Form.Label>To</Form.Label>
+                    <Form.Label>{api.loc("to")}</Form.Label>
                     <Form.Control
                         type='datetime-local'
                         value={
@@ -353,7 +352,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                         isInvalid={dateTimeToInvalid}
                     />
                     <Form.Control.Feedback type='invalid'>
-                        Please enter a valid date and time.
+                        {api.loc("please_enter_valid_dt")}
                     </Form.Control.Feedback>
                 </Form.Group>
             </Form>
@@ -371,7 +370,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                         <FormGroup>
                             <Form.Control
                                 type='text'
-                                placeholder='Search logs...'
+                                placeholder={api.loc("search_logs")}
                                 value={searchText}
                                 onChange={(e) => setSearchText(e.target.value)}
                                 style={{
@@ -414,7 +413,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                             </Button>
                             <Form.Check
                                 type='checkbox'
-                                label='Case Sensitive'
+                                label={api.loc("case_sensitive")}
                                 checked={caseSensitive}
                                 onChange={(e) => setCaseSensitive(e.target.checked)}
                                 style={{
@@ -425,7 +424,7 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                             />
                             <Form.Check
                                 type='checkbox'
-                                label='Regex'
+                                label={api.loc("regex")}
                                 checked={useRegex}
                                 onChange={(e) => setUseRegex(e.target.checked)}
                                 style={{
@@ -442,18 +441,18 @@ function ProcessCardLogs({process, selectedTab, showDetails}) {
                     >
                         {isFull ? (
                             <>
-                                <FullscreenExit size={24}/> Collapse
+                                <FullscreenExit size={24}/> {api.loc("collapse")}
                             </>
                         ) : (
                             <>
-                                <Fullscreen size={24}/> Expand
+                                <Fullscreen size={24}/> {api.loc("expand")}
                             </>
                         )}
                     </Button>
                 </div>
 
                 <div
-                    className={`log-container ${isFull ? 'full' : 'collapsed'}`}
+                    className={`log-container ${isFull ? api.loc("full") : api.loc('collapsed')}`}
                     dangerouslySetInnerHTML={processedLogs}
                 ></div>
             </Container>

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Button, Form, Modal, Table} from 'react-bootstrap';
 import {X} from 'react-bootstrap-icons'; // Importing icons
-import api, {rgbaToHex} from '../api';
+import api, {rgbaToHex, formatString} from '../api';
 import {SketchPicker} from 'react-color';
 import LoadingSpinner from '../loadingSpinner';
 
@@ -158,11 +158,11 @@ const NewProcessModal = ({show, handleClose, groups}) => {
         const errors = {};
         // validation:
         if (!NewProcessParams.name) {
-            errors.processName = 'Process name is required';
+            errors.processName = api.loc("process_name_required");
         }
 
         if (!NewProcessParams.executable_path) {
-            errors.executablePath = 'Executable path is required';
+            errors.executablePath = api.loc("executable_path_required");
         }
 
         const maxRetriesErr = api.validate(
@@ -210,7 +210,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
         ) {
             if (!wasWarned) {
                 errors.warned_about_auto_restart_max_retries = true;
-                errors.processRestartMaxRetries = `The process will never stop retrying, because it can retry ${auto_restart_max_retries_within_timeframe} times within the timeframe of ${NewProcessParams.config.auto_restart_max_retries_frame} seconds with the delay of ${NewProcessParams.config.auto_restart_delay} milliseconds. Click "Create" again to confirm.`;
+                errors.processRestartMaxRetries = formatString(api.loc("the_process_will_not_stop_restarting"), {auto_restart_max_retries_within_timeframe: auto_restart_max_retries_within_timeframe, timeframe: NewProcessParams.config.auto_restart_max_retries_frame, auto_restart_delay: NewProcessParams.config.auto_restart_delay});
                 setFormErrors(errors);
                 return;
             }
@@ -218,7 +218,6 @@ const NewProcessModal = ({show, handleClose, groups}) => {
 
         setFormErrors({});
 
-        console.log(NewProcessParams);
         setSavingProcess(true);
         if (doCreate) {
             api
@@ -270,14 +269,14 @@ const NewProcessModal = ({show, handleClose, groups}) => {
     return (
         <Modal show={show} onHide={handleClose('newProcess')}>
             <Modal.Header closeButton>
-                <Modal.Title>New Process</Modal.Title>
+                <Modal.Title>{api.loc("new_process")}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form.Group>
-                    <Form.Label>Process Name</Form.Label>
+                    <Form.Label>{api.loc("process_name")}</Form.Label>
                     <Form.Control
                         type='text'
-                        placeholder='Enter process name'
+                        placeholder={api.loc("enter_process_name")}
                         isInvalid={!!formErrors.processName}
                         value={processName}
                         onChange={(e) => {
@@ -297,7 +296,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     </Form.Control.Feedback>
                 </Form.Group>
 
-                <Form.Label>Process status:</Form.Label>
+                <Form.Label>{api.loc("process_status")}</Form.Label>
                 {/*enabled by default*/}
                 <Form.Check
                     type='switch'
@@ -318,10 +317,10 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                 ></Form.Check>
 
                 <Form.Group>
-                    <Form.Label>Executable Path</Form.Label>
+                    <Form.Label>{api.loc("executable_path")}</Form.Label>
                     <Form.Control
                         type='text'
-                        placeholder='Enter executable path'
+                        placeholder={api.loc("enter_executable_path")}
                         isInvalid={!!formErrors.executablePath}
                         value={executablePath}
                         onChange={(e) => {
@@ -344,19 +343,19 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     </Form.Control.Feedback>
                 </Form.Group>
 
-                <Form.Label>Arguments</Form.Label>
+                <Form.Label>{api.loc("arguments")}</Form.Label>
                 <Form.Control
                     type='text'
-                    placeholder='Enter arguments'
+                    placeholder={api.loc("enter_arguments")}
                     id={'Arguments'}
                     value={programArguments}
                     onChange={(e) => setProgramArguments(e.target.value)}
                 />
 
-                <Form.Label>Working Directory</Form.Label>
+                <Form.Label>{api.loc("working_directory")}</Form.Label>
                 <Form.Control
                     type='text'
-                    placeholder='Enter working directory'
+                    placeholder={api.loc("enter_working_directory")}
                     id={'WorkingDirectory'}
                     value={workingDirectory}
                     onChange={(e) => {
@@ -365,7 +364,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     }}
                 />
 
-                <Form.Label>Color</Form.Label>
+                <Form.Label>{api.loc("color")}</Form.Label>
                 <div
                     style={{
                         display: 'flex',
@@ -397,7 +396,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     )}
                 </div>
                 <Form.Group>
-                    <Form.Label>Group</Form.Label>
+                    <Form.Label>{api.loc("group")}</Form.Label>
                     <Form.Control
                         as='select'
                         value={selectedGroupId || ''}
@@ -436,29 +435,29 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                             setDoCreateGroup(value === 'addNew');
                         }}
                     >
-                        <option value={null}>No Group</option>
+                        <option value={null}>{api.loc("no_group")}</option>
                         {groups.map((group) => (
                             <option key={group.id} value={group.id}>
                                 {group.name}
                             </option>
                         ))}
-                        <option value='addNew'>Add Group</option>
+                        <option value='addNew'>{api.loc("add_new")}</option>
                     </Form.Control>
                 </Form.Group>
 
                 {doCreateGroup && (
                     <>
                         <Form.Group>
-                            <Form.Label>Group Name</Form.Label>
+                            <Form.Label>{api.loc("group_name")}</Form.Label>
                             <Form.Control
                                 type='text'
-                                placeholder='Enter new group name'
+                                placeholder={api.loc("enter_group_name")}
                                 value={newGroupName}
                                 onChange={(e) => setNewGroupName(e.target.value)}
                             />
                         </Form.Group>
                         <Form.Group>
-                            <Form.Label>Group Color</Form.Label>
+                            <Form.Label>{api.loc("group_color")}</Form.Label>
                             <div style={{display: 'flex', alignItems: 'center'}}>
                                 <Button
                                     style={{
@@ -485,13 +484,13 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     </>
                 )}
 
-                <Form.Label>Environment Variables</Form.Label>
+                <Form.Label>{api.loc("environment_variables")}</Form.Label>
                 <Table bordered>
                     <thead>
                     <tr>
-                        <th>Environmental Variable</th>
-                        <th>Value</th>
-                        <th>Remove</th>
+                        <th>{api.loc("environment_variable")}</th>
+                        <th>{api.loc("value")}</th>
+                        <th>{api.loc("remove")}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -502,7 +501,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                                     type='text'
                                     value={envVar.key}
                                     onChange={(e) => handleEnvVarChange(index, e.target.value)}
-                                    placeholder='Key'
+                                    placeholder={api.loc("key")}
                                 />
                             </td>
                             <td>
@@ -512,7 +511,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                                     onChange={(e) =>
                                         handleEnvVarChange(index, undefined, e.target.value)
                                     }
-                                    placeholder='Value'
+                                    placeholder={api.loc("value")}
                                 />
                             </td>
                             <td>
@@ -524,18 +523,18 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                     ))}
                     <tr>
                         <td colSpan='3'>
-                            <Button onClick={addEnvVar}>Add Variable</Button>
+                            <Button onClick={addEnvVar}>{api.loc("add_variable")}</Button>
                         </td>
                     </tr>
                     </tbody>
                 </Table>
 
-                <Form.Label>Configuration</Form.Label>
+                <Form.Label>{api.loc("configuration")}</Form.Label>
 
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Automatically restart when stopped (exit 0)'
+                        label={api.loc("auto_restart_on_stop")}
                         checked={autoRestartOnStop}
                         onChange={(e) => setAutoRestartOnStop(e.target.checked)}
                     />
@@ -543,13 +542,13 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Automatically restart when crashed (exit non-0)'
+                        label={api.loc("auto_restart_on_crash")}
                         checked={autoRestartOnCrash}
                         onChange={(e) => setAutoRestartOnCrash(e.target.checked)}
                     />
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Max Retries</Form.Label>
+                    <Form.Label>{api.loc("max_retries")}</Form.Label>
                     <Form.Control
                         type='number'
                         value={autoRestartMaxRetries}
@@ -579,8 +578,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>
-                        Retry Timeframe (seconds) - time window, within which "Max Retries"
-                        is counted. When 0, it's ignored
+                        {api.loc("restart_timeframe")}
                     </Form.Label>
                     <Form.Control
                         type='number'
@@ -611,7 +609,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>
-                        Retry Delay (milliseconds) - time to wait before retrying
+                        {api.loc("restart_delay")}
                     </Form.Label>
                     <Form.Control
                         type='number'
@@ -643,7 +641,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Notify on crash'
+                        label={api.loc("notify_on_crash")}
                         checked={notifyOnCrash}
                         onChange={(e) => setNotifyOnCrash(e.target.checked)}
                     />
@@ -651,7 +649,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Notify on stop'
+                        label={api.loc("notify_on_stop")}
                         checked={notifyOnStop}
                         onChange={(e) => setNotifyOnStop(e.target.checked)}
                     />
@@ -659,7 +657,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Notify on start'
+                        label={api.loc("notify_on_start")}
                         checked={notifyOnStart}
                         onChange={(e) => setNotifyOnStart(e.target.checked)}
                     />
@@ -667,7 +665,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Notify on restart'
+                        label={api.loc("notify_on_restart")}
                         checked={notifyOnRestart}
                         onChange={(e) => setNotifyOnRestart(e.target.checked)}
                     />
@@ -688,7 +686,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
 
             <Modal.Footer>
                 <Button variant='secondary' onClick={handleClose('newProcess')}>
-                    Close
+                    {api.loc("close")}
                 </Button>
                 <Button
                     id='createProcessBtn'
@@ -700,7 +698,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                         LoadingSpinner()
                     ) : (
                         <div>
-                            <X style={{fontSize: '1.5rem', rotate: '45deg'}}/> Create
+                            <X style={{fontSize: '1.5rem', rotate: '45deg'}}/> {api.loc("create")}
                         </div>
                     )}
                 </Button>

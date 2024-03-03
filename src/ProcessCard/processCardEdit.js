@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Button, Container, Form, Table} from 'react-bootstrap';
 import {Pencil, X} from 'react-bootstrap-icons'; // Importing icons
 import {SketchPicker} from 'react-color';
-import api, {hexToRgba, rgbaToHex} from '../api';
+import api, {formatString, hexToRgba, rgbaToHex} from '../api';
 import LoadingSpinner from '../loadingSpinner';
 
 function ProcessCardEdit({
@@ -311,7 +311,7 @@ function ProcessCardEdit({
         ) {
             if (!wasWarned) {
                 errors.warned_about_auto_restart_max_retries = true;
-                errors.processRestartMaxRetries = `The process will never stop retrying, because it can retry ${auto_restart_max_retries_within_timeframe} times within the timeframe of ${patchProcessParams.config.auto_restart_max_retries_frame} seconds with the delay of ${patchProcessParams.config.auto_restart_delay} milliseconds. Click "Create" again to confirm.`;
+                errors.processRestartMaxRetries = formatString(api.loc("the_process_will_not_stop_restarting"), {auto_restart_max_retries_within_timeframe: auto_restart_max_retries_within_timeframe, timeframe: patchProcessParams.config.auto_restart_max_retries_frame, auto_restart_delay: patchProcessParams.config.auto_restart_delay});
                 setFormErrors(errors);
                 return;
             }
@@ -341,10 +341,10 @@ function ProcessCardEdit({
     return (
         <Container>
             <Form.Group>
-                <Form.Label>Process Name</Form.Label>
+                <Form.Label>{api.loc("process_name")}</Form.Label>
                 <Form.Control
                     type='text'
-                    placeholder='Enter process name'
+                    placeholder={api.loc("enter_process_name")}
                     isInvalid={!!formErrors.processName}
                     value={processName}
                     onChange={(e) => {
@@ -364,12 +364,12 @@ function ProcessCardEdit({
                 </Form.Control.Feedback>
             </Form.Group>
 
-            <Form.Label>Process status:</Form.Label>
+            <Form.Label>{api.loc("process_status")}</Form.Label>
             {/*enabled by default*/}
             <Form.Check
                 type='switch'
                 id='custom-switch'
-                label='Enabled'
+                label={enabled ? api.loc("enabled") : api.loc("disabled")}
                 checked={enabled}
                 onChange={
                     /* Change Enabled/Disabled label */
@@ -385,10 +385,10 @@ function ProcessCardEdit({
             ></Form.Check>
 
             <Form.Group>
-                <Form.Label>Executable Path</Form.Label>
+                <Form.Label>{api.loc("executable_path")}</Form.Label>
                 <Form.Control
                     type='text'
-                    placeholder='Enter executable path'
+                    placeholder={api.loc("enter_executable_path")}
                     isInvalid={!!formErrors.executablePath}
                     value={executablePath}
                     onChange={(e) => {
@@ -411,19 +411,19 @@ function ProcessCardEdit({
                 </Form.Control.Feedback>
             </Form.Group>
 
-            <Form.Label>Arguments</Form.Label>
+            <Form.Label>{api.loc("arguments")}</Form.Label>
             <Form.Control
                 type='text'
-                placeholder='Enter arguments'
+                placeholder={api.loc("enter_arguments")}
                 id={'Arguments'}
                 value={programArguments}
                 onChange={(e) => setProgramArguments(e.target.value)}
             />
 
-            <Form.Label>Working Directory</Form.Label>
+            <Form.Label>{api.loc("working_directory")}</Form.Label>
             <Form.Control
                 type='text'
-                placeholder='Enter working directory'
+                placeholder={api.loc("enter_working_directory")}
                 id={'WorkingDirectory'}
                 value={workingDirectory}
                 onChange={(e) => {
@@ -432,7 +432,7 @@ function ProcessCardEdit({
                 }}
             />
 
-            <Form.Label>Color</Form.Label>
+            <Form.Label>{api.loc("color")}</Form.Label>
             <div
                 style={{
                     display: 'flex',
@@ -464,7 +464,7 @@ function ProcessCardEdit({
                 )}
             </div>
             <Form.Group>
-                <Form.Label>Group</Form.Label>
+                <Form.Label>{api.loc("group")}</Form.Label>
                 <Form.Control
                     as='select'
                     value={selectedGroupId}
@@ -497,29 +497,29 @@ function ProcessCardEdit({
                         setDoCreateGroup(value === 'addNew');
                     }}
                 >
-                    <option value={null}>No Group</option>
+                    <option value={null}>{api.loc("no_group")}</option>
                     {groups.map((group) => (
                         <option key={group.id} value={group.id}>
                             {group.name}
                         </option>
                     ))}
-                    <option value='addNew'>Add Group</option>
+                    <option value='addNew'>{api.loc("add_new")}</option>
                 </Form.Control>
             </Form.Group>
 
             {doCreateGroup && (
                 <>
                     <Form.Group>
-                        <Form.Label>Group Name</Form.Label>
+                        <Form.Label>{api.loc("group_name")}</Form.Label>
                         <Form.Control
                             type='text'
-                            placeholder='Enter new group name'
+                            placeholder={api.loc("enter_group_name")}
                             value={newGroupName}
                             onChange={(e) => setNewGroupName(e.target.value)}
                         />
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label>Group Color</Form.Label>
+                        <Form.Label>{api.loc("group_color")}</Form.Label>
                         <div style={{display: 'flex', alignItems: 'center'}}>
                             <Button
                                 style={{
@@ -546,13 +546,13 @@ function ProcessCardEdit({
                 </>
             )}
 
-            <Form.Label>Environment Variables</Form.Label>
+            <Form.Label>{api.loc("environment_variables")}</Form.Label>
             <Table bordered>
                 <thead>
                 <tr>
-                    <th>Environmental Variable</th>
-                    <th>Value</th>
-                    <th>Remove</th>
+                    <th>{api.loc("environment_variable")}</th>
+                    <th>{api.loc("value")}</th>
+                    <th>{api.loc("remove")}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -563,7 +563,7 @@ function ProcessCardEdit({
                                 type='text'
                                 value={envVar.key}
                                 onChange={(e) => handleEnvVarChange(index, e.target.value)}
-                                placeholder='Key'
+                                placeholder={api.loc("key")}
                             />
                         </td>
                         <td>
@@ -573,7 +573,7 @@ function ProcessCardEdit({
                                 onChange={(e) =>
                                     handleEnvVarChange(index, undefined, e.target.value)
                                 }
-                                placeholder='Value'
+                                placeholder={api.loc("value")}
                             />
                         </td>
                         <td>
@@ -587,19 +587,19 @@ function ProcessCardEdit({
                     <td colSpan='3'>
                         <Button onClick={addEnvVar}>
                             <X style={{fontSize: '1.5rem', rotate: '45deg'}}/>
-                            Add Variable
+                            {api.loc("add_variable")}
                         </Button>
                     </td>
                 </tr>
                 </tbody>
             </Table>
 
-            <Form.Label>Configuration</Form.Label>
+            <Form.Label>{api.loc("configuration")}</Form.Label>
 
             <Form.Group>
                 <Form.Check
                     type='switch'
-                    label='Automatically restart when stopped (exit 0)'
+                    label={api.loc("auto_restart_on_stop")}
                     checked={autoRestartOnStop}
                     onChange={(e) => setAutoRestartOnStop(e.target.checked)}
                 />
@@ -607,13 +607,13 @@ function ProcessCardEdit({
             <Form.Group>
                 <Form.Check
                     type='switch'
-                    label='Automatically restart when crashed (exit non-0)'
+                    label={api.loc("auto_restart_on_crash")}
                     checked={autoRestartOnCrash}
                     onChange={(e) => setAutoRestartOnCrash(e.target.checked)}
                 />
             </Form.Group>
             <Form.Group>
-                <Form.Label>Max Retries</Form.Label>
+                <Form.Label>{api.loc("max_retries")}</Form.Label>
                 <Form.Control
                     type='number'
                     value={autoRestartMaxRetries}
@@ -643,8 +643,7 @@ function ProcessCardEdit({
             </Form.Group>
             <Form.Group>
                 <Form.Label>
-                    Retry Timeframe (seconds) - time window, within which "Max Retries" is
-                    counted. When 0, it's ignored
+                    {api.loc("restart_timeframe")}
                 </Form.Label>
                 <Form.Control
                     type='number'
@@ -675,7 +674,7 @@ function ProcessCardEdit({
             </Form.Group>
             <Form.Group>
                 <Form.Label>
-                    Retry Delay (milliseconds) - time to wait before retrying
+                    {api.loc("restart_delay")}
                 </Form.Label>
                 <Form.Control
                     type='number'
@@ -707,7 +706,7 @@ function ProcessCardEdit({
             <Form.Group>
                 <Form.Check
                     type='switch'
-                    label='Notify on crash'
+                    label={api.loc("notify_on_crash")}
                     checked={notifyOnCrash}
                     onChange={(e) => setNotifyOnCrash(e.target.checked)}
                 />
@@ -715,7 +714,7 @@ function ProcessCardEdit({
             <Form.Group>
                 <Form.Check
                     type='switch'
-                    label='Notify on stop'
+                    label={api.loc("notify_on_stop")}
                     checked={notifyOnStop}
                     onChange={(e) => setNotifyOnStop(e.target.checked)}
                 />
@@ -723,7 +722,7 @@ function ProcessCardEdit({
             <Form.Group>
                 <Form.Check
                     type='switch'
-                    label='Notify on start'
+                    label={api.loc("notify_on_start")}
                     checked={notifyOnStart}
                     onChange={(e) => setNotifyOnStart(e.target.checked)}
                 />
@@ -731,7 +730,7 @@ function ProcessCardEdit({
             <Form.Group>
                 <Form.Check
                     type='switch'
-                    label='Notify on restart'
+                    label={api.loc("notify_on_restart")}
                     checked={notifyOnRestart}
                     onChange={(e) => setNotifyOnRestart(e.target.checked)}
                 />
@@ -759,7 +758,7 @@ function ProcessCardEdit({
                     LoadingSpinner()
                 ) : (
                     <div>
-                        <Pencil style={{marginBottom: '2px'}}/> Save
+                        <Pencil style={{marginBottom: '2px'}}/> {api.loc("save")}
                     </div>
                 )}
             </Button>

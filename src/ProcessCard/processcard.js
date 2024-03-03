@@ -122,7 +122,7 @@ function ProcessCard({process}) {
                     >
             <span style={{color: process.enabled ? 'green' : 'red'}}>
               {' '}
-                {process.enabled ? ' Enabled' : ' Disabled'}
+                {process.enabled ? ' '+api.loc("enabled") : ' '+api.loc("disabled")}
             </span>
                         <span style={{fontWeight: 'bold'}}>{' | '}</span>
                         <span
@@ -177,7 +177,7 @@ function ProcessCard({process}) {
                         style={customButtonStyle}
                         onClick={(e) => restartProcess(e)}
                     >
-                        {restarting ? LoadingSpinner() : 'Restart'}
+                        {restarting ? LoadingSpinner() : api.loc("restart")}
                     </Button>
                 </div>
                 <div className='d-flex mt-2 justify-content-center'>
@@ -186,7 +186,7 @@ function ProcessCard({process}) {
                         onClick={handleDetailsShow}
                         style={customButtonStyle}
                     >
-                        Show Details
+                        {api.loc("show_details")}
                     </Button>
                 </div>
             </Card.Body>
@@ -194,7 +194,7 @@ function ProcessCard({process}) {
             {/* Modal for detailed info */}
             <Modal show={showDetails} onHide={handleDetailsClose} size={'xl'}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Details for {process.name}</Modal.Title>
+                    <Modal.Title>{api.loc("details_for")} {process.name}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Tabs
@@ -202,21 +202,21 @@ function ProcessCard({process}) {
                         onSelect={(k) => setSelectedTab(k)}
                         className='mb-4'
                     >
-                        <Tab eventKey={'status'} title='Status, resources, events'>
+                        <Tab eventKey={'status'} title={api.loc("status_resources_events")}>
                             <ProcessCardStats
                                 process={process}
                                 showDetails={showDetails}
                                 selectedTab={selectedTab}
                             ></ProcessCardStats>
                         </Tab>
-                        <Tab title={'Logs'} eventKey={'logs'}>
+                        <Tab title={api.loc("logs")} eventKey={'logs'}>
                             <ProcessCardLogs
                                 process={process}
                                 showDetails={showDetails}
                                 selectedTab={selectedTab}
                             ></ProcessCardLogs>
                         </Tab>
-                        <Tabs title={'Configuration'} eventKey={'configuration'}>
+                        <Tabs title={api.loc("configuration")} eventKey={'configuration'}>
                             <ProcessCardEdit
                                 process={process}
                                 showDetails={showDetails}
@@ -228,7 +228,7 @@ function ProcessCard({process}) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant='secondary' onClick={handleDetailsClose}>
-                        Close
+                        {api.loc("close")}
                     </Button>
                 </Modal.Footer>
             </Modal>

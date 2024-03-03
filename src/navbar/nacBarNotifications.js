@@ -67,33 +67,33 @@ function NotificationsModal({handleClose}) {
     return (
         <Container>
             <Modal.Header closeButton>
-                <Modal.Title>Notifications</Modal.Title>
+                <Modal.Title>{api.loc("notifications")}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form>
-                    <FormLabel>Enable/disable notifications</FormLabel>
+                    <FormLabel>{api.loc("enable_disable_notifications")}</FormLabel>
                     <Form.Check
                         type='switch'
-                        label={enabled ? 'Enabled' : 'Disabled'}
+                        label={enabled ? api.loc("enabled") : api.loc("disabled")}
                         checked={enabled}
                         onChange={(e) => setEnabled(e.target.checked)}
                     />
 
-                    <FormLabel>Telegram bot token</FormLabel>
+                    <FormLabel>{api.loc("telegram_bot_token")}</FormLabel>
                     <Form.Control
                         type='password'
-                        placeholder='Enter bot token'
+                        placeholder={api.loc("enter_bot_token")}
                         value={botToken}
                         onChange={(e) => setBotToken(e.target.value)}
                     />
 
-                    <FormLabel>Chat IDs</FormLabel>
+                    <FormLabel>{api.loc("chat_ids")}</FormLabel>
 
                     <Table bordered>
                         <thead>
                         <tr>
-                            <th>Chat Id</th>
-                            <th>Remove</th>
+                            <th>{api.loc("chat_id")}</th>
+                            <th>{api.loc("remove")}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -104,7 +104,7 @@ function NotificationsModal({handleClose}) {
                                         type='text'
                                         value={chatId}
                                         onChange={(e) => handleChatIdChange(index, e.target.value)}
-                                        placeholder='Chat id'
+                                        placeholder={api.loc("chat_id")}
                                     />
                                 </td>
                                 <td>
@@ -120,7 +120,7 @@ function NotificationsModal({handleClose}) {
                                     addChatId(0)
                                 }}>
                                     <X style={{fontSize: '1.5rem', rotate: '45deg'}}/>
-                                    Add chat id
+                                    {api.loc("add_chat_id")}
                                 </Button>
                             </td>
                         </tr>
@@ -130,13 +130,13 @@ function NotificationsModal({handleClose}) {
             </Modal.Body>
             <Modal.Footer>
                 <Button variant='secondary' onClick={handleClose('notifications')}>
-                    Close
+                    {api.loc("close")}
                 </Button>
                 <Button variant='primary'
                         onClick={saveConfig}
                         disabled={saving}
                 >
-                    {saving ? LoadingSpinner() : 'Save'}
+                    {saving ? LoadingSpinner() : api.loc("save")}
                 </Button>
             </Modal.Footer>
         </Container>

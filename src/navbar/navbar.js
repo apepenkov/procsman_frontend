@@ -165,14 +165,14 @@ function NavBarHeader({switchView, view}) {
                             style={view === 'dashboard' ? activeTabStyle : {}}
                             onClick={() => switchView('dashboard')}
                         >
-                            Dashboard
+                            {api.loc("dashboard")}
                         </Nav.Link>
                     </Nav>
                     <Nav className='nav-icon-container'>
                         <OverlayTrigger
                             overlay={
                                 <Tooltip style={ToolTipStyle} id='tooltip-new-process'>
-                                    Add Process
+                                    {api.loc("add_process")}
                                 </Tooltip>
                             }
                             placement='bottom'
@@ -187,14 +187,14 @@ function NavBarHeader({switchView, view}) {
                     style={MobileLabelStyle}
                     onClick={handleShow('newProcess')}
                 >
-                  Add Process
+                  {api.loc("add_process")}
                 </span>
               </span>
                         </OverlayTrigger>
                         <OverlayTrigger
                             overlay={
                                 <Tooltip style={ToolTipStyle} id='tooltip-create-group'>
-                                    Add Group
+                                    {api.loc("add_group")}
                                 </Tooltip>
                             }
                             placement='bottom'
@@ -209,14 +209,14 @@ function NavBarHeader({switchView, view}) {
                     style={MobileLabelStyle}
                     onClick={handleShow('createGroup')}
                 >
-                  Add Group
+                    {api.loc("add_group")}
                 </span>
               </span>
                         </OverlayTrigger>
                         <OverlayTrigger
                             overlay={
                                 <Tooltip style={ToolTipStyle} id='tooltip-notifications'>
-                                    Notification Settings
+                                    {api.loc("notification_settings")}
                                 </Tooltip>
                             }
                             placement='bottom'
@@ -228,14 +228,14 @@ function NavBarHeader({switchView, view}) {
                     style={MobileLabelStyle}
                     onClick={handleShow('notifications')}
                 >
-                  Notifications
+                  {api.loc("notifications")}
                 </span>
               </span>
                         </OverlayTrigger>
                         <OverlayTrigger
                             overlay={
                                 <Tooltip style={ToolTipStyle} id='tooltip-settings'>
-                                    Settings
+                                    {api.loc("settings")}
                                 </Tooltip>
                             }
                             placement='bottom'
@@ -247,14 +247,14 @@ function NavBarHeader({switchView, view}) {
                     style={MobileLabelStyle}
                     onClick={handleShow('settings')}
                 >
-                  Settings
+                  {api.loc("settings")}
                 </span>
               </span>
                         </OverlayTrigger>
                         <OverlayTrigger
                             overlay={
                                 <Tooltip style={ToolTipStyle} id='tooltip-logout'>
-                                    Logout
+                                    {api.loc("logout")}
                                 </Tooltip>
                             }
                             placement='bottom'
@@ -266,7 +266,7 @@ function NavBarHeader({switchView, view}) {
                     style={MobileLabelStyle}
                     onClick={logout}
                 >
-                  Logout
+                    {api.loc("logout")}
                 </span>
               </span>
                         </OverlayTrigger>
@@ -277,14 +277,34 @@ function NavBarHeader({switchView, view}) {
             {/* Settings Modal */}
             <Modal show={showSettings} onHide={handleClose('settings')}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Settings</Modal.Title>
+                    <Modal.Title>{api.loc("settings")}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>Settings form or content here.</Modal.Body>
+                <Modal.Body>
+                    {/*Language picker*/}
+                    <div className='mb-3'>
+                        <label htmlFor='language' className='form-label'>
+                            Select Language
+                        </label>
+                        <select
+                            className='form-select'
+                            id='language'
+                            value={api.localeKey}
+                            onChange={(e) => {
+                                api.localeKey = e.target.value;
+                                api.save();
+                                window.location.reload();
+                            }}
+                        >
+                            <option value='en'>English</option>
+                            <option value='ru'>Русский</option>
+                        </select>
+                    </div>
+
+                </Modal.Body>
                 <Modal.Footer>
                     <Button variant='secondary' onClick={handleClose('settings')}>
-                        Close
+                        {api.loc("close")}
                     </Button>
-                    <Button variant='primary'>Save Changes</Button>
                 </Modal.Footer>
             </Modal>
             {/* New Process Modal */}

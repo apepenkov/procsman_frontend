@@ -96,7 +96,7 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
         ...SharedChartOptions,
         title: {
             left: 'center',
-            text: 'CPU Usage (%)',
+            text: api.loc("cpu_usage"),
         },
     };
 
@@ -104,7 +104,7 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
         ...SharedChartOptions,
         title: {
             left: 'center',
-            text: 'RAM Usage (MB)',
+            text: api.loc("ram_usage"),
         },
     };
 
@@ -239,8 +239,8 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
             <Table striped bordered hover>
                 <thead>
                 <tr>
-                    <th>Timestamp</th>
-                    <th>Event Type</th>
+                    <th>{api.loc("timestamp")}</th>
+                    <th>{api.loc("event_type")}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -297,7 +297,7 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
                             <ArrowClockwise
                                 style={{marginBottom: '4px'}}
                             ></ArrowClockwise>{' '}
-                            Refresh
+                            {api.loc("refresh")}
                         </div>
                     )}
                 </Button>
@@ -305,7 +305,7 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
             <div className='normalization-controls'>
                 <Form>
                     <Form.Group controlId='dateTimeFrom'>
-                        <Form.Label>From</Form.Label>
+                        <Form.Label>{api.loc("from")}</Form.Label>
                         <Form.Control
                             type='datetime-local'
                             value={toLocalISOString(dateTimeFrom)}
@@ -324,11 +324,11 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
                             isInvalid={dateTimeFromInvalid}
                         />
                         <Form.Control.Feedback type='invalid'>
-                            Please enter a valid date and time.
+                            {api.loc("please_enter_valid_dt")}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group controlId='dateTimeTo'>
-                        <Form.Label>To</Form.Label>
+                        <Form.Label>{api.loc("to")}</Form.Label>
                         <Form.Control
                             type='datetime-local'
                             value={
@@ -351,7 +351,7 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
                             isInvalid={dateTimeToInvalid}
                         />
                         <Form.Control.Feedback type='invalid'>
-                            Please enter a valid date and time.
+                            {api.loc("please_enter_valid_dt")}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Form>
@@ -363,9 +363,9 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
                 <div ref={ramChartRef} style={{width: '100%', height: '400px'}}></div>
             </div>
             <div>
-                <h3>Events (last 30): </h3>
+                <h3>{api.loc("events_last_30_days")}</h3>
                 <Button onClick={refreshAndSetEventsData} disabled={loadingEvents}>
-                    {loadingEvents ? LoadingSpinner() : 'Refresh Events'}
+                    {loadingEvents ? LoadingSpinner() : api.loc("refresh_events")}
                 </Button>
                 {renderEventsTable()}
             </div>

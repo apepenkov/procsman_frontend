@@ -94,7 +94,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
             },
         };
         if (!NewGroupParams.name) {
-            setFormErrors({groupName: 'Group name is required'});
+            setFormErrors({groupName: api.loc("group_name_required")});
             return;
         }
         setFormErrors({});
@@ -115,14 +115,14 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
             setShowEditGroup(false)
         }} size={'xl'} style={{backdropFilter: 'blur(5px)'}}>
             <Modal.Header closeButton>
-                <Modal.Title>Editing group: {group.name}</Modal.Title>
+                <Modal.Title>{api.loc("editing_group")} {group.name}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form.Group controlId='newGroupName'>
-                    <Form.Label>Group Name</Form.Label>
+                    <Form.Label>{api.loc("group_name")}</Form.Label>
                     <Form.Control
                         type='text'
-                        placeholder='Enter group name'
+                        placeholder={api.loc("enter_group_name")}
                         value={groupName}
                         onChange={(e) => {
                             const val = e.target.value;
@@ -140,7 +140,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                         {formErrors.groupName}
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Label>Group Color</Form.Label>
+                <Form.Label>{api.loc("group_color")}</Form.Label>
                 <div style={{display: 'flex', alignItems: 'center'}}>
                     <Button
                         style={{
@@ -165,13 +165,13 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                 </div>
 
                 <Form.Label>
-                    Default configuration for processes within group
+                    {api.loc("default_configuration")}
                 </Form.Label>
 
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Automatically restart when stopped (exit 0)'
+                        label={api.loc("auto_restart_on_stop")}
                         defaultChecked={autoRestartOnStop}
                         onChange={(e) => setAutoRestartOnStop(e.target.checked)}
                     />
@@ -179,13 +179,13 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Automatically restart when crashed (exit non-0)'
+                        label={api.loc("auto_restart_on_crash")}
                         defaultChecked={autoRestartOnCrash}
                         onChange={(e) => setAutoRestartOnCrash(e.target.checked)}
                     />
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Max Retries</Form.Label>
+                    <Form.Label>{api.loc("max_retries")}</Form.Label>
                     <Form.Control
                         type='number'
                         defaultValue={autoRestartMaxRetries}
@@ -215,8 +215,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>
-                        Retry Timeframe (seconds) - time window, within which "Max Retries"
-                        is counted. When 0, it's ignored.
+                        {api.loc("restart_timeframe")}
                     </Form.Label>
                     <Form.Control
                         type='number'
@@ -247,7 +246,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>
-                        Retry Delay (milliseconds) - time to wait before retrying
+                        {api.loc("restart_delay")}
                     </Form.Label>
                     <Form.Control
                         type='number'
@@ -279,7 +278,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Notify on crash'
+                        label={api.loc("notify_on_crash")}
                         defaultChecked={notifyOnCrash}
                         onChange={(e) => setNotifyOnCrash(e.target.checked)}
                     />
@@ -287,7 +286,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Notify on stop'
+                        label={api.loc("notify_on_stop")}
                         defaultChecked={notifyOnStop}
                         onChange={(e) => setNotifyOnStop(e.target.checked)}
                     />
@@ -295,7 +294,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Notify on start'
+                        label={api.loc("notify_on_start")}
                         defaultChecked={notifyOnStart}
                         onChange={(e) => setNotifyOnStart(e.target.checked)}
                     />
@@ -303,7 +302,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                 <Form.Group>
                     <Form.Check
                         type='switch'
-                        label='Notify on restart'
+                        label={api.loc("notify_on_restart")}
                         defaultChecked={notifyOnReStart}
                         onChange={(e) => setNotifyOnReStart(e.target.checked)}
                     />
@@ -314,7 +313,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                 <Button variant='secondary' onClick={() => {
                     setShowEditGroup(null)
                 }}>
-                    Close
+                    {api.loc("close")}
                 </Button>
                 <Button
                     variant='primary'
@@ -325,7 +324,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                         LoadingSpinner()
                     ) : (
                         <div>
-                            Save
+                            {api.loc("save")}
                             <Pencil style={{marginLeft: '5px', marginBottom: '4px'}}/>
                         </div>
                     )}

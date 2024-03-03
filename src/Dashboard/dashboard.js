@@ -138,7 +138,7 @@ function Dashboard({switchView, view}) {
                 className='mt-4'
                 style={{background: 'rgba(255, 255, 255, 0.6)', borderRadius: '10px'}}
             >
-                <h4>Pinned Processes</h4>
+                <h4>{api.loc("pinned_processes")}</h4>
 
                 {isLoading ? (
                         <Row className={rowClasses}>
@@ -155,25 +155,25 @@ function Dashboard({switchView, view}) {
                         </Row>
                     ) : (
                         <div className='d-flex justify-content-center'>
-                            <p>No pinned processes</p>
+                            <p>{api.loc("no_pin_processes")}</p>
                         </div>
                     )}
 
-                <h4 className='mt-4'>All Processes</h4>
+                <h4 className='mt-4'>{api.loc("all_processes")}</h4>
 
                 <Tabs
                     activeKey={selectedTab}
                     onSelect={(k) => setSelectedTab(k)}
                     className='mb-4'
                 >
-                    <Tab eventKey='none' title='No Group'>
+                    <Tab eventKey='none' title={api.loc("no_group")}>
                         <Row className={rowClasses}>
                             {renderProcessCards(
                                 groupedProcesses.processes.filter((p) => !p.process_group_id)
                             )}
                         </Row>
                     </Tab>
-                    <Tab eventKey='all' title='All'>
+                    <Tab eventKey='all' title={api.loc("all")}>
                         {isLoading ? (
                             <Row className={rowClasses}>
                                 {Array.from({length: 3}).map((_, index) => (
