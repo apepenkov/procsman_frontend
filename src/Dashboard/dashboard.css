@@ -22,3 +22,12 @@
     background-color: #e0e0e0;
     margin: 10px 0;
 }
+
+.floating-container {
+    position: sticky;
+    top: 70px; /* Adjust this value based on the actual height of your NavBar */
+    z-index: 1000; /* Ensure it stays on top of other content */
+    border-radius: 10px; /* Optional: only if you want rounded corners */
+    margin-bottom: 20px; /* Add some space between the floating container and the content below */
+}
+

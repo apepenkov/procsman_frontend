@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Container, Modal, Nav, Navbar, OverlayTrigger, Tooltip} from 'react-bootstrap';
-import {Bell, BoxArrowRight, Gear, PersonPlus, PlusCircle,} from 'react-bootstrap-icons'; // Importing icons
+import {Bell, BoxArrowRight, Gear, PersonPlus, PlusCircle, X,} from 'react-bootstrap-icons'; // Importing icons
 import api from '../api';
 import NewProcessModal from './navBarCreateProcess';
 import NewGroupModal from './navBarCreateGroup';
 import NotificationsModal from "./nacBarNotifications";
+import './navbar.css';
 
 function NavBarHeader({switchView, view}) {
     // States for showing/hiding modals
@@ -323,6 +324,11 @@ function NavBarHeader({switchView, view}) {
             <Modal show={showNotifications} onHide={handleClose('notifications')}>
                 <NotificationsModal handleClose={handleClose}></NotificationsModal>
             </Modal>
+            <div className="fab-container">
+                <Button variant="primary" className="fab" style={{borderRadius: '50%'}} onClick={() => setShowNewProcess(true)}>
+                    <X style={{fontSize: '1.5rem', rotate: '45deg'}}/>
+                </Button>
+            </div>
         </Navbar>
     );
 }

@@ -301,7 +301,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                 <Form.Check
                     type='switch'
                     id='custom-switch'
-                    label='Enabled'
+                    label={enabled ? api.loc("enabled") : api.loc("disabled")}
                     checked={enabled}
                     onChange={
                         /* Change Enabled/Disabled label */

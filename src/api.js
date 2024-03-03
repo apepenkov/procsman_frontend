@@ -126,6 +126,7 @@ const locales = {
         cpu_usage: 'CPU usage (% of whole system)',
         ram_usage: 'RAM usage (MB)',
         key: 'Key',
+        search_placeholder: 'Search for process: part of process name or cmd line',
     },
     ru: {
         errors: {
@@ -253,7 +254,8 @@ const locales = {
         refresh_events: "Обновить события",
         cpu_usage: "Использование ЦПУ (% от всей системы)",
         ram_usage: "Использование ОЗУ (МБ)",
-        key: "Ключ"
+        key: "Ключ",
+        search_placeholder: "поиск процесса: часть имени процесса или командной строки"
     }
 };
 

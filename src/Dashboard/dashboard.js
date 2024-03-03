@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Card, Col, Container, Modal, Row, Tab, Tabs} from 'react-bootstrap';
+import {Card, Col, Container, Form, Row, Tab, Tabs} from 'react-bootstrap';
 import ProcessCard from '../ProcessCard/processcard';
 import NavBarHeader from '../navbar/navbar';
 import api, {GroupInfo, ProcessInfo} from '../api';
 import './dashboard.css';
-import {Gear} from "react-bootstrap-icons";
+import {Gear, X} from "react-bootstrap-icons";
 import EditGroup from "./editGroup";
+import Button from "react-bootstrap/Button";
 
 const SkeletonCard = () => {
     return (
@@ -43,6 +44,7 @@ function Dashboard({switchView, view}) {
     const [selectedTab, setSelectedTab] = useState('all');
     const [isLoading, setIsLoading] = useState(false);
     const [showEditGroup, setShowEditGroup] = useState(null);
+    const [searchText, setSearchText] = useState('');
 
     const rowClasses = 'd-flex justify-content-center';
 
@@ -111,11 +113,22 @@ function Dashboard({switchView, view}) {
             return;
         }
         const dynamicColSizes = calculateColSizes(processes.length);
-        return processes.map((process) => (
-            <Col key={process.id} {...dynamicColSizes} className={rowClasses}>
-                <ProcessCard process={process}/>
-            </Col>
-        ));
+        const toRender = [];
+        for (let i = 0; i < processes.length; i++) {
+            if (
+                searchText.length > 0 &&
+                (!processes[i].name.toLowerCase().includes(searchText.toLowerCase()) &&
+                    !processes[i].cmdLine().toLowerCase().includes(searchText.toLowerCase()))
+            ) {
+                continue;
+            }
+            toRender.push(
+                <Col key={processes[i].id} {...dynamicColSizes} className={rowClasses}>
+                    <ProcessCard process={processes[i]}/>
+                </Col>
+            );
+        }
+        return toRender;
     };
 
     const renderGroupedProcessCards = (groupId) => {
@@ -133,6 +146,17 @@ function Dashboard({switchView, view}) {
     return (
         <div>
             <NavBarHeader switchView={switchView} view={view}/>
+            <div className="floating-container">
+                <Container style={{justifyContent: 'center'}}>
+                    <Form>
+                        <Form.Group className="mb-3" controlId="formBasicSearch">
+                            <Form.Control type="search" placeholder={api.loc('search_placeholder')} value={searchText}
+                                          onChange={(e) => setSearchText(e.target.value)}/>
+                        </Form.Group>
+                    </Form>
+                </Container>
+            </div>
+
             <Container
                 // it should take up 90% of the width of the screen
                 className='mt-4'
@@ -192,7 +216,9 @@ function Dashboard({switchView, view}) {
                         <Tab eventKey={groupId} title={
                             // group.name
                             selectedTab === groupId ? (
-                                <div onClick={() => {setShowEditGroup(group.id)}}>
+                                <div onClick={() => {
+                                    setShowEditGroup(group.id)
+                                }}>
                                     {group.name}
                                     <Gear style={{marginLeft: '5px', marginBottom: '4px'}}></Gear>
                                 </div>
@@ -209,7 +235,9 @@ function Dashboard({switchView, view}) {
                     ))}
                 </Tabs>
             </Container>
+
         </div>
+
     );
 }
 
