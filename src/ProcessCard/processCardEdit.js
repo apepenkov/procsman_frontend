@@ -132,6 +132,9 @@ function ProcessCardEdit({
     const [notifyOnStart, setNotifyOnStart] = useState(
         process.getConfiguration('notify_on_start')
     );
+    const [notifyOnRestart, setNotifyOnRestart] = useState(
+        process.getConfiguration('notify_on_restart')
+    );
 
     // UNUSED
     const [recordStats, setRecordStats] = useState(
@@ -170,7 +173,6 @@ function ProcessCardEdit({
         for (const key in process.environment) {
             newEnvVars.push({key: key, value: process.environment[key]});
         }
-        // TODO: correctly set current group
         setEnvVars(newEnvVars);
         api.mbCallback(true);
 
@@ -196,6 +198,7 @@ function ProcessCardEdit({
         setNotifyOnCrash(process.getConfiguration('notify_on_crash'));
         setNotifyOnStop(process.getConfiguration('notify_on_stop'));
         setNotifyOnStart(process.getConfiguration('notify_on_start'));
+        setNotifyOnRestart(process.getConfiguration('notify_on_restart'));
 
         setRecordStats(process.getConfiguration('record_stats'));
         setStoreLogs(process.getConfiguration('store_logs'));
@@ -230,9 +233,10 @@ function ProcessCardEdit({
                 auto_restart_max_retries_frame: parseInt(autoRestartMaxRetriesFrame),
                 auto_restart_delay: parseInt(autoRestartDelay),
 
-                notify_on_start: notifyOnStop,
+                notify_on_start: notifyOnStart,
                 notify_on_stop: notifyOnStop,
                 notify_on_crash: notifyOnCrash,
+                notify_on_restart: notifyOnRestart,
 
                 record_stats: recordStats,
                 store_logs: storeLogs,
@@ -486,6 +490,7 @@ function ProcessCardEdit({
                             setNotifyOnCrash(process.getConfiguration('notify_on_crash', value));
                             setNotifyOnStop(process.getConfiguration('notify_on_stop', value));
                             setNotifyOnStart(process.getConfiguration('notify_on_start', value));
+                            setNotifyOnRestart(process.getConfiguration('notify_on_restart', value));
                             setRecordStats(process.getConfiguration('record_stats', value));
                             setStoreLogs(process.getConfiguration('store_logs', value));
                         }
@@ -721,6 +726,14 @@ function ProcessCardEdit({
                     label='Notify on start'
                     checked={notifyOnStart}
                     onChange={(e) => setNotifyOnStart(e.target.checked)}
+                />
+            </Form.Group>
+            <Form.Group>
+                <Form.Check
+                    type='switch'
+                    label='Notify on restart'
+                    checked={notifyOnRestart}
+                    onChange={(e) => setNotifyOnRestart(e.target.checked)}
                 />
             </Form.Group>
             {/*<Form.Group>*/}

@@ -116,6 +116,7 @@ const fallbackConfiguration = new Map(
         notify_on_start: true,
         notify_on_stop: true,
         notify_on_crash: true,
+        notify_on_restart: true,
 
         // UNUSED
         record_stats: true,
@@ -954,6 +955,27 @@ class ApiInterface {
             );
             await this.mbCallback();
             return res;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async getNotificationConfig() {
+        try {
+            return await this.request('GET', '/notification_config');
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async setNotificationConfig(config) {
+        try {
+            return await this.request(
+                'PATCH',
+                '/notification_config',
+                configPopupAndThrow,
+                config
+            );
         } catch (e) {
             return null;
         }

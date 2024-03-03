@@ -5,7 +5,7 @@ import api, {buildGradient} from '../api';
 import ProcessCardStats from './processCardStats';
 import ProcessCardLogs from './processCardLogs';
 import ProcessCardEdit from './processCardEdit';
-import LoadingSpinner from '../loadingSpinner';
+import LoadingSpinner from "../loadingSpinner";
 
 function ProcessCard({process}) {
     const [showDetails, setShowDetails] = useState(false);
@@ -16,6 +16,8 @@ function ProcessCard({process}) {
         process.togglePinned();
     };
     const [selectedTab, setSelectedTab] = useState('status');
+    const [stopping, setStopping] = useState(false);
+    const [restarting, setRestarting] = useState(false);
 
     const startStopProcess = (e) => {
         const res = process.startOrStop();
@@ -23,12 +25,7 @@ function ProcessCard({process}) {
             return;
         }
 
-        e.enabled = false;
-        e.target.disabled = true; // set loading state
-        // set loading state
-        const wasHtml = e.target.innerHTML;
-
-        e.target.innerHTML = LoadingSpinner();
+        setStopping(true);
 
         setTimeout(() => {
             api.mbCallback();
@@ -44,9 +41,7 @@ function ProcessCard({process}) {
                 .then(() => {
                 })
                 .finally(() => {
-                    e.target.innerHTML = wasHtml;
-                    e.target.disabled = false;
-                    e.enabled = true;
+                    setStopping(false);
                 });
         } else {
             api
@@ -54,18 +49,13 @@ function ProcessCard({process}) {
                 .then(() => {
                 })
                 .finally(() => {
-                    e.target.innerHTML = wasHtml;
-                    e.target.disabled = false;
-                    e.enabled = true;
+                    setStopping(false);
                 });
         }
     };
 
     const restartProcess = (e) => {
-        e.target.disabled = true; // set loading state
-        // set loading state
-        const wasHtml = e.target.innerHTML;
-        e.target.innerHTML = LoadingSpinner();
+        setRestarting(true);
 
         setTimeout(() => {
             api.mbCallback();
@@ -75,13 +65,9 @@ function ProcessCard({process}) {
             api.mbCallback();
         }, 600);
 
-        api
-            .restartProcess(process.id)
-            .then(() => {
-                e.target.disabled = false;
-            })
+        api.restartProcess(process.id)
             .finally(() => {
-                e.target.innerHTML = wasHtml;
+                setRestarting(false);
             });
     };
 
@@ -175,23 +161,23 @@ function ProcessCard({process}) {
                 <div className='d-flex justify-content-center'>
                     <Button
                         variant={process.startOrStop() === null ? 'secondary' : 'success'}
-                        disabled={process.startOrStop() === null}
+                        disabled={process.startOrStop() === null || stopping}
                         className='mr-1 btn-sm'
                         style={customButtonStyle}
                         onClick={(e) => startStopProcess(e)}
                         id={'start-stop-button'}
                     >
-                        {process.startOrStopText()}
+                        {stopping ? LoadingSpinner() : process.startOrStopText()}
                     </Button>
                     <span style={{width: '3px'}}></span>
                     <Button
                         variant={process.canRestart() ? 'warning' : 'secondary'}
-                        disabled={!process.canRestart()}
+                        disabled={!process.canRestart() || restarting}
                         className='ml-1 btn-sm'
                         style={customButtonStyle}
                         onClick={(e) => restartProcess(e)}
                     >
-                        Restart
+                        {restarting ? LoadingSpinner() : 'Restart'}
                     </Button>
                 </div>
                 <div className='d-flex mt-2 justify-content-center'>

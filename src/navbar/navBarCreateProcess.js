@@ -74,6 +74,9 @@ const NewProcessModal = ({show, handleClose, groups}) => {
     const [notifyOnStart, setNotifyOnStart] = useState(
         api.getConfiguration('notify_on_start')
     );
+    const [notifyOnRestart, setNotifyOnRestart] = useState(
+        api.getConfiguration('notify_on_restart')
+    );
 
     // UNUSED
     const [recordStats, setRecordStats] = useState(
@@ -129,9 +132,10 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                 auto_restart_max_retries_frame: parseInt(autoRestartMaxRetriesFrame),
                 auto_restart_delay: parseInt(autoRestartDelay),
 
-                notify_on_start: notifyOnStop,
+                notify_on_start: notifyOnStart,
                 notify_on_stop: notifyOnStop,
                 notify_on_crash: notifyOnCrash,
+                notify_on_restart: notifyOnRestart,
 
                 record_stats: recordStats,
                 store_logs: storeLogs,
@@ -250,6 +254,7 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                         setNotifyOnCrash(api.getConfiguration('notify_on_crash'));
                         setNotifyOnStop(api.getConfiguration('notify_on_stop'));
                         setNotifyOnStart(api.getConfiguration('notify_on_start'));
+                        setNotifyOnRestart(api.getConfiguration('notify_on_restart'));
                         setRecordStats(api.getConfiguration('record_stats'));
                         setStoreLogs(api.getConfiguration('store_logs'));
                     } else {
@@ -421,6 +426,9 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                                 setNotifyOnStop(api.getConfiguration('notify_on_stop', value));
                                 setNotifyOnStart(
                                     api.getConfiguration('notify_on_start', value)
+                                );
+                                setNotifyOnRestart(
+                                    api.getConfiguration('notify_on_restart', value)
                                 );
                                 setRecordStats(api.getConfiguration('record_stats', value));
                                 setStoreLogs(api.getConfiguration('store_logs', value));
@@ -654,6 +662,14 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                         label='Notify on start'
                         checked={notifyOnStart}
                         onChange={(e) => setNotifyOnStart(e.target.checked)}
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Check
+                        type='switch'
+                        label='Notify on restart'
+                        checked={notifyOnRestart}
+                        onChange={(e) => setNotifyOnRestart(e.target.checked)}
                     />
                 </Form.Group>
                 {/*<Form.Group>*/}

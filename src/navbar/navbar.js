@@ -4,6 +4,7 @@ import {Bell, BoxArrowRight, Gear, PersonPlus, PlusCircle,} from 'react-bootstra
 import api from '../api';
 import NewProcessModal from './navBarCreateProcess';
 import NewGroupModal from './navBarCreateGroup';
+import NotificationsModal from "./nacBarNotifications";
 
 function NavBarHeader({switchView, view}) {
     // States for showing/hiding modals
@@ -298,16 +299,7 @@ function NavBarHeader({switchView, view}) {
             ></NewGroupModal>
             {/* Notifications Modal */}
             <Modal show={showNotifications} onHide={handleClose('notifications')}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Notifications</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>Notifications settings or content here.</Modal.Body>
-                <Modal.Footer>
-                    <Button variant='secondary' onClick={handleClose('notifications')}>
-                        Close
-                    </Button>
-                    <Button variant='primary'>Save Changes</Button>
-                </Modal.Footer>
+                <NotificationsModal handleClose={handleClose}></NotificationsModal>
             </Modal>
         </Navbar>
     );

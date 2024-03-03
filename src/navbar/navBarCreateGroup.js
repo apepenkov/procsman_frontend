@@ -60,6 +60,9 @@ const NewGroupModal = ({show, handleClose, groups}) => {
     const [notifyOnStart, setNotifyOnStart] = useState(
         api.getConfiguration('notify_on_start')
     );
+    const [notifyOnReStart, setNotifyOnReStart] = useState(
+        api.getConfiguration('notify_on_restart')
+    );
 
     // UNUSED
     const [recordStats, setRecordStats] = useState(
@@ -82,8 +85,9 @@ const NewGroupModal = ({show, handleClose, groups}) => {
                 auto_restart_max_retries_frame: parseInt(autoRestartMaxRetriesFrame),
                 auto_restart_delay: parseInt(autoRestartDelay),
                 notify_on_crash: notifyOnCrash,
+                notify_on_restart: notifyOnReStart,
                 notify_on_stop: notifyOnStop,
-                notify_on_start: notifyOnStop,
+                notify_on_start: notifyOnStart,
                 record_stats: recordStats,
                 store_logs: storeLogs,
             },
@@ -299,6 +303,15 @@ const NewGroupModal = ({show, handleClose, groups}) => {
                         onChange={(e) => setNotifyOnStart(e.target.checked)}
                     />
                 </Form.Group>
+                <Form.Group>
+                    <Form.Check
+                        type='switch'
+                        label='Notify on restart'
+                        defaultChecked={notifyOnReStart}
+                        onChange={(e) => setNotifyOnReStart(e.target.checked)}
+                    />
+                </Form.Group>
+
                 {/*<Form.Group>*/}
                 {/*    <Form.Check type='switch' label='Record stats'*/}
                 {/*                defaultChecked={recordStats}*/}
