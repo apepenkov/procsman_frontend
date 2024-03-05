@@ -4,9 +4,9 @@ import ProcessCard from '../ProcessCard/processcard';
 import NavBarHeader from '../navbar/navbar';
 import api, {GroupInfo, ProcessInfo} from '../api';
 import './dashboard.css';
-import {Gear, X} from "react-bootstrap-icons";
+import {Gear} from "react-bootstrap-icons";
 import EditGroup from "./editGroup";
-import Button from "react-bootstrap/Button";
+import {WrapInTooltip} from "../guideModeContext";
 
 const SkeletonCard = () => {
     return (
@@ -150,19 +150,23 @@ function Dashboard({switchView, view}) {
                 <Container style={{justifyContent: 'center'}}>
                     <Form>
                         <Form.Group className="mb-3" controlId="formBasicSearch">
-                            <Form.Control type="search" placeholder={api.loc('search_placeholder')} value={searchText}
-                                          onChange={(e) => setSearchText(e.target.value)}/>
+                            <WrapInTooltip text={api.loc("guide", "search")} placement={"left"}>
+                                <Form.Control type="search" placeholder={api.loc('search_placeholder')} value={searchText}
+                                              onChange={(e) => setSearchText(e.target.value)}/>
+                            </WrapInTooltip>
+
                         </Form.Group>
                     </Form>
                 </Container>
             </div>
 
             <Container
-                // it should take up 90% of the width of the screen
                 className='mt-4'
                 style={{background: 'rgba(255, 255, 255, 0.6)', borderRadius: '10px'}}
             >
-                <h4>{api.loc("pinned_processes")}</h4>
+                <WrapInTooltip text={api.loc("guide", "pinned_processes")} placement={"bottom"}>
+                    <h4>{api.loc("pinned_processes")}</h4>
+                </WrapInTooltip>
 
                 {isLoading ? (
                         <Row className={rowClasses}>
@@ -190,41 +194,62 @@ function Dashboard({switchView, view}) {
                     onSelect={(k) => setSelectedTab(k)}
                     className='mb-4'
                 >
-                    <Tab eventKey='none' title={api.loc("no_group")}>
+                    <Tab eventKey='none' title={
+                        <WrapInTooltip text={api.loc("guide", "processes_no_group")} placement={"left"}>
+                            <div>{api.loc("no_group")}</div>
+                        </WrapInTooltip>
+                    }>
                         <Row className={rowClasses}>
                             {renderProcessCards(
                                 groupedProcesses.processes.filter((p) => !p.process_group_id)
                             )}
                         </Row>
                     </Tab>
-                    <Tab eventKey='all' title={api.loc("all")}>
-                        {isLoading ? (
-                            <Row className={rowClasses}>
-                                {Array.from({length: 3}).map((_, index) => (
-                                    <Col key={index} className={rowClasses}>
-                                        <SkeletonCard/>
-                                    </Col>
-                                ))}
-                            </Row> // Placeholder for your loading animation
-                        ) : (
-                            <Row className={rowClasses}>
-                                {renderProcessCards(groupedProcesses.processes)}
-                            </Row>
-                        )}
-                    </Tab>
-                    {Object.entries(groupedProcesses.groups).map(([groupId, group]) => (
-                        <Tab eventKey={groupId} title={
-                            // group.name
-                            selectedTab === groupId ? (
-                                <div onClick={() => {
-                                    setShowEditGroup(group.id)
-                                }}>
-                                    {group.name}
-                                    <Gear style={{marginLeft: '5px', marginBottom: '4px'}}></Gear>
-                                </div>
+
+
+                    <Tab eventKey='all'
+                         title={
+                             <WrapInTooltip text={api.loc("guide", "all_processes")} placement={"bottom"}>
+                                 <div>{api.loc("all")}</div>
+                             </WrapInTooltip>
+                         }
+                    >
+                        <div>
+                            {isLoading ? (
+                                <Row className={rowClasses}>
+                                    {Array.from({length: 3}).map((_, index) => (
+                                        <Col key={index} className={rowClasses}>
+                                            <SkeletonCard/>
+                                        </Col>
+                                    ))}
+                                </Row> // Placeholder for your loading animation
                             ) : (
-                                group.name
-                            )
+                                <Row className={rowClasses}>
+                                    {renderProcessCards(groupedProcesses.processes)}
+                                </Row>
+                            )}
+                        </div>
+                    </Tab>
+
+
+                    {Object.entries(groupedProcesses.groups).map(([groupId, group], index) => (
+                        <Tab eventKey={groupId} title={
+                            /*All but 1st element must have dummy=true by checking index in a list*/
+                            <WrapInTooltip dummy={index !== 0} text={api.loc("guide", "group_name")} placement={"right"}>
+                                <div>
+                                    {selectedTab === groupId ? (
+                                        <div onClick={() => {
+                                            setShowEditGroup(group.id)
+                                        }}>
+                                            {group.name}
+                                            <Gear style={{marginLeft: '5px', marginBottom: '4px'}}></Gear>
+                                        </div>
+                                    ) : (
+                                        group.name
+                                    )}
+                                </div>
+                            </WrapInTooltip>
+
                         } key={groupId}>
                             <EditGroup showEditGroup={showEditGroup} setShowEditGroup={setShowEditGroup} group={group}/>
 

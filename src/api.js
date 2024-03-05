@@ -33,6 +33,14 @@ const locales = {
             group_name_required: 'Group name required',
             executable_required: 'Executable path required',
         },
+        guide: {
+            pinned_processes: "You can click on a pin icon to add process to the top of the dashboard. It's saved in your browser.",
+            processes_no_group: 'Processes without a group will be shown here.',
+            all_processes: 'All processes will be shown here.',
+            group_name: 'You can select a group and click on it again to edit it.',
+            search: 'You can search for a process by part of its name or command line. Processes, not matching the search, will be hidden.',
+            add_process: 'You can add a new process by clicking this button.',
+        },
         close: 'Close',
         unknown_error: 'Unknown error, status:',
         error_making_request: 'Error making request: ',
@@ -131,6 +139,7 @@ const locales = {
         ram_usage: 'RAM usage (MB)',
         key: 'Key',
         search_placeholder: 'Search for process: part of process name or cmd line',
+        guide_mode: 'Guide mode',
     },
     ru: {
         errors: {
@@ -165,6 +174,14 @@ const locales = {
             process_name_required: "Требуется имя процесса",
             group_name_required: "Требуется имя группы",
             executable_required: "Требуется путь к исполняемому файлу"
+        },
+        guide: {
+            pinned_processes: "Вы можете нажать на значок булавки, чтобы добавить процесс в верхнюю часть панели инструментов. Он сохраняется в вашем браузере.",
+            processes_no_group: "Процессы без группы будут показаны здесь.",
+            all_processes: "Все процессы будут показаны здесь.",
+            group_name: "Вы можете выбрать группу и снова нажать на нее, чтобы отредактировать ее.",
+            search: "Вы можете искать процесс по части его имени или командной строки. Процессы, не соответствующие поиску, будут скрыты.",
+            add_process: "Вы можете добавить новый процесс, нажав эту кнопку."
         },
         close: "Закрыть",
         unknown_error: "Неизвестная ошибка, статус:",
@@ -263,7 +280,8 @@ const locales = {
         cpu_usage: "Использование ЦПУ (% от всей системы)",
         ram_usage: "Использование ОЗУ (МБ)",
         key: "Ключ",
-        search_placeholder: "поиск процесса: часть имени процесса или командной строки"
+        search_placeholder: "поиск процесса: часть имени процесса или командной строки",
+        guide_mode: "Режим помощи"
     }
 };
 

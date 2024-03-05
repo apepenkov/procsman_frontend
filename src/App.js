@@ -3,6 +3,7 @@ import {useEffect, useState} from 'react';
 import Auth from './Authorization/auth';
 import api from './api';
 import Dashboard from './Dashboard/dashboard';
+import {GuideModeProvider} from "./guideModeContext";
 
 function Loading() {
     return (
@@ -33,11 +34,13 @@ function App() {
     }, []);
 
     return (
-        <div>
-            {view === 'loading' && <Loading/>}
-            {view === 'auth' && <Auth switchView={setView}/>}
-            {view === 'dashboard' && <Dashboard switchView={setView} view={view}/>}
-        </div>
+        <GuideModeProvider>
+            <div>
+                {view === 'loading' && <Loading/>}
+                {view === 'auth' && <Auth switchView={setView}/>}
+                {view === 'dashboard' && <Dashboard switchView={setView} view={view}/>}
+            </div>
+        </GuideModeProvider>
     );
 }
 

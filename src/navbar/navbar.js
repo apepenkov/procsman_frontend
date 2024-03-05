@@ -6,6 +6,8 @@ import NewProcessModal from './navBarCreateProcess';
 import NewGroupModal from './navBarCreateGroup';
 import NotificationsModal from "./nacBarNotifications";
 import './navbar.css';
+import Form from "react-bootstrap/Form";
+import {useGuideMode, WrapInTooltip} from '../guideModeContext';
 
 function NavBarHeader({switchView, view}) {
     // States for showing/hiding modals
@@ -17,6 +19,8 @@ function NavBarHeader({switchView, view}) {
     const [groups, setGroups] = useState([]);
 
     const [prevData, setPrevData] = useState(null);
+
+    const {guideMode, setGuideMode} = useGuideMode();
 
     useEffect(() => {
         const fetchGroups = async () => {
@@ -170,6 +174,15 @@ function NavBarHeader({switchView, view}) {
                         </Nav.Link>
                     </Nav>
                     <Nav className='nav-icon-container'>
+                        <div className="d-none d-md-block">
+                            <span style={{alignItems: "center", display: "flex", marginLeft: '16px'}}>
+                            <Form.Switch value={guideMode} onChange={() => setGuideMode(!guideMode)}
+                                         style={{marginRight: '10px'}}></Form.Switch>
+                                {api.loc("guide_mode")}
+                        </span>
+                        </div>
+
+
                         <OverlayTrigger
                             overlay={
                                 <Tooltip style={ToolTipStyle} id='tooltip-new-process'>
@@ -178,19 +191,19 @@ function NavBarHeader({switchView, view}) {
                             }
                             placement='bottom'
                         >
-              <span style={iconWrapperStyle}>
-                <PlusCircle
-                    style={iconStyle}
-                    onClick={handleShow('newProcess')}
-                />
-                <span
-                    className='d-lg-none'
-                    style={MobileLabelStyle}
-                    onClick={handleShow('newProcess')}
-                >
-                  {api.loc("add_process")}
-                </span>
-              </span>
+                          <span style={iconWrapperStyle}>
+                            <PlusCircle
+                                style={iconStyle}
+                                onClick={handleShow('newProcess')}
+                            />
+                            <span
+                                className='d-lg-none'
+                                style={MobileLabelStyle}
+                                onClick={handleShow('newProcess')}
+                            >
+                              {api.loc("add_process")}
+                            </span>
+                          </span>
                         </OverlayTrigger>
                         <OverlayTrigger
                             overlay={
@@ -200,19 +213,19 @@ function NavBarHeader({switchView, view}) {
                             }
                             placement='bottom'
                         >
-              <span style={iconWrapperStyle}>
-                <PersonPlus
-                    style={iconStyle}
-                    onClick={handleShow('createGroup')}
-                />
-                <span
-                    className='d-lg-none'
-                    style={MobileLabelStyle}
-                    onClick={handleShow('createGroup')}
-                >
-                    {api.loc("add_group")}
-                </span>
-              </span>
+                          <span style={iconWrapperStyle}>
+                            <PersonPlus
+                                style={iconStyle}
+                                onClick={handleShow('createGroup')}
+                            />
+                            <span
+                                className='d-lg-none'
+                                style={MobileLabelStyle}
+                                onClick={handleShow('createGroup')}
+                            >
+                                {api.loc("add_group")}
+                            </span>
+                          </span>
                         </OverlayTrigger>
                         <OverlayTrigger
                             overlay={
@@ -222,16 +235,16 @@ function NavBarHeader({switchView, view}) {
                             }
                             placement='bottom'
                         >
-              <span style={iconWrapperStyle}>
-                <Bell style={iconStyle} onClick={handleShow('notifications')}/>
-                <span
-                    className='d-lg-none'
-                    style={MobileLabelStyle}
-                    onClick={handleShow('notifications')}
-                >
-                  {api.loc("notifications")}
-                </span>
-              </span>
+                          <span style={iconWrapperStyle}>
+                            <Bell style={iconStyle} onClick={handleShow('notifications')}/>
+                            <span
+                                className='d-lg-none'
+                                style={MobileLabelStyle}
+                                onClick={handleShow('notifications')}
+                            >
+                              {api.loc("notifications")}
+                            </span>
+                          </span>
                         </OverlayTrigger>
                         <OverlayTrigger
                             overlay={
@@ -241,16 +254,16 @@ function NavBarHeader({switchView, view}) {
                             }
                             placement='bottom'
                         >
-              <span style={iconWrapperStyle}>
-                <Gear style={iconStyle} onClick={handleShow('settings')}/>
-                <span
-                    className='d-lg-none'
-                    style={MobileLabelStyle}
-                    onClick={handleShow('settings')}
-                >
-                  {api.loc("settings")}
-                </span>
-              </span>
+                          <span style={iconWrapperStyle}>
+                            <Gear style={iconStyle} onClick={handleShow('settings')}/>
+                            <span
+                                className='d-lg-none'
+                                style={MobileLabelStyle}
+                                onClick={handleShow('settings')}
+                            >
+                              {api.loc("settings")}
+                            </span>
+                          </span>
                         </OverlayTrigger>
                         <OverlayTrigger
                             overlay={
@@ -260,22 +273,24 @@ function NavBarHeader({switchView, view}) {
                             }
                             placement='bottom'
                         >
-              <span style={iconWrapperStyle}>
-                <BoxArrowRight style={iconStyle} onClick={logout}/>
-                <span
-                    className='d-lg-none'
-                    style={MobileLabelStyle}
-                    onClick={logout}
-                >
-                    {api.loc("logout")}
-                </span>
-              </span>
+                          <span style={iconWrapperStyle}>
+                            <BoxArrowRight style={iconStyle} onClick={logout}/>
+                            <span
+                                className='d-lg-none'
+                                style={MobileLabelStyle}
+                                onClick={logout}
+                            >
+                                {api.loc("logout")}
+                            </span>
+                          </span>
                         </OverlayTrigger>
+
                     </Nav>
                 </Navbar.Collapse>
             </Container>
 
-            {/* Settings Modal */}
+            {/* Settings Modal */
+            }
             <Modal show={showSettings} onHide={handleClose('settings')}>
                 <Modal.Header closeButton>
                     <Modal.Title>{api.loc("settings")}</Modal.Title>
@@ -308,29 +323,38 @@ function NavBarHeader({switchView, view}) {
                     </Button>
                 </Modal.Footer>
             </Modal>
-            {/* New Process Modal */}
+            {/* New Process Modal */
+            }
             <NewProcessModal
                 groups={groups}
                 handleClose={handleClose}
                 show={showNewProcess}
             ></NewProcessModal>
-            {/* Create Group Modal */}
+            {/* Create Group Modal */
+            }
             <NewGroupModal
                 groups={groups}
                 handleClose={handleClose}
                 show={showCreateGroup}
             ></NewGroupModal>
-            {/* Notifications Modal */}
+            {/* Notifications Modal */
+            }
             <Modal show={showNotifications} onHide={handleClose('notifications')}>
                 <NotificationsModal handleClose={handleClose}></NotificationsModal>
             </Modal>
+
             <div className="fab-container">
-                <Button variant="primary" className="fab" style={{borderRadius: '50%'}} onClick={() => setShowNewProcess(true)}>
-                    <X style={{fontSize: '1.5rem', rotate: '45deg'}}/>
-                </Button>
+                <WrapInTooltip text={api.loc("guide", "add_process")}>
+                    <Button variant="primary" className="fab" style={{borderRadius: '50%'}}
+                            onClick={() => setShowNewProcess(true)}>
+                        <X style={{fontSize: '1.5rem', rotate: '45deg'}}/>
+                    </Button>
+                </WrapInTooltip>
             </div>
+
         </Navbar>
-    );
+    )
+        ;
 }
 
 export default NavBarHeader;
