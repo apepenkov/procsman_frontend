@@ -1,5 +1,8 @@
 FROM node:latest as build-stage
 
+ARG REACT_APP_API_ENDPOINT
+ENV REACT_APP_API_ENDPOINT=$REACT_APP_API_ENDPOINT
+
 WORKDIR /app
 
 COPY package*.json ./
