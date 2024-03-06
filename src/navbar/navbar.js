@@ -1,6 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Container, Modal, Nav, Navbar, OverlayTrigger, Tooltip} from 'react-bootstrap';
-import {Bell, BoxArrowRight, Gear, PersonPlus, PlusCircle, X,} from 'react-bootstrap-icons'; // Importing icons
+import {
+    Bell,
+    BoxArrowRight,
+    BrightnessHigh,
+    BrightnessHighFill,
+    Gear,
+    PersonPlus,
+    PlusCircle,
+    X
+} from 'react-bootstrap-icons'; // Importing icons
 import api from '../api';
 import NewProcessModal from './navBarCreateProcess';
 import NewGroupModal from './navBarCreateGroup';
@@ -21,6 +30,19 @@ function NavBarHeader({switchView, view}) {
     const [prevData, setPrevData] = useState(null);
 
     const {guideMode, setGuideMode} = useGuideMode();
+
+    const [theme, setTheme] = useState(api.theme);
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-bs-theme', theme);
+    }, [theme]);
+
+    const toggleTheme = () => {
+        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+        api.theme = newTheme;
+        api.save();
+    };
 
     useEffect(() => {
         const fetchGroups = async () => {
@@ -45,9 +67,9 @@ function NavBarHeader({switchView, view}) {
 
     // Inline styles
     const activeTabStyle = {
-        backgroundColor: '#f0f0f0',
+        // backgroundColor: '#f0f0f0',
         borderRadius: '5px',
-        color: 'black',
+        // color: 'black',
         fontWeight: 'bold',
     };
 
@@ -155,7 +177,7 @@ function NavBarHeader({switchView, view}) {
 
     return (
         <Navbar
-            bg='light'
+            // bg='light'
             expand='lg'
             style={{marginBottom: '20px'}}
             sticky='top'
@@ -174,6 +196,7 @@ function NavBarHeader({switchView, view}) {
                         </Nav.Link>
                     </Nav>
                     <Nav className='nav-icon-container'>
+
                         <div className="d-none d-md-block">
                             <span style={{alignItems: "center", display: "flex", marginLeft: '16px'}}>
                             <Form.Switch value={guideMode} onChange={() => setGuideMode(!guideMode)}
@@ -182,7 +205,17 @@ function NavBarHeader({switchView, view}) {
                         </span>
                         </div>
 
-
+                        <span style={iconWrapperStyle}>
+                            {theme === 'dark' ? <BrightnessHigh style={iconStyle} onClick={toggleTheme}/> :
+                                <BrightnessHighFill style={iconStyle} onClick={toggleTheme}/>}
+                            <span
+                                className='d-lg-none'
+                                style={MobileLabelStyle}
+                                onClick={toggleTheme}
+                            >
+                              {api.loc("switch_theme")}
+                            </span>
+                        </span>
                         <OverlayTrigger
                             overlay={
                                 <Tooltip style={ToolTipStyle} id='tooltip-new-process'>
@@ -313,6 +346,25 @@ function NavBarHeader({switchView, view}) {
                         >
                             <option value='en'>English</option>
                             <option value='ru'>Русский</option>
+                        </select>
+                    </div>
+                    {/*Card mode picker*/}
+                    <div className='mb-3'>
+                        <label htmlFor='cardMode' className='form-label'>
+                            {api.loc("select_mode")}
+                        </label>
+                        <select
+                            className='form-select'
+                            id='cardMode'
+                            value={api.cardMode() ? 'card' : 'table'}
+                            onChange={(e) => {
+                                api.setCardMode(e.target.value === 'card');
+                                api.save();
+                                window.location.reload();
+                            }}
+                        >
+                            <option value='card'>{api.loc("card_mode")}</option>
+                            <option value='table'>{api.loc("table_mode")}</option>
                         </select>
                     </div>
 

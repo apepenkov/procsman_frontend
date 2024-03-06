@@ -1,7 +1,7 @@
-.custom-tooltip .tooltip-inner {
-    background-color: rgba(0, 0, 0, 0.8); /* Adjust background transparency using alpha value */
-}
+/*.custom-tooltip .tooltip-inner {*/
+/*    background-color: rgba(0, 0, 0, 0.8); !* Adjust background transparency using alpha value *!*/
+/*}*/
 
-.custom-tooltip .arrow::before {
-    border-top-color: rgba(0, 0, 0, 0.7); /* Adjust this based on the tooltip placement */
-}
+/*.custom-tooltip .arrow::before {*/
+/*    border-top-color: rgba(0, 0, 0, 0.7); !* Adjust this based on the tooltip placement *!*/
+/*}*/

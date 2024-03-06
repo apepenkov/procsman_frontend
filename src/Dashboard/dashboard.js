@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Card, Col, Container, Form, Row, Tab, Tabs} from 'react-bootstrap';
+import {Card, Col, Container, Form, Row, Tab, Table, Tabs} from 'react-bootstrap';
 import ProcessCard from '../ProcessCard/processcard';
 import NavBarHeader from '../navbar/navbar';
 import api, {GroupInfo, ProcessInfo} from '../api';
@@ -7,6 +7,7 @@ import './dashboard.css';
 import {Gear} from "react-bootstrap-icons";
 import EditGroup from "./editGroup";
 import {WrapInTooltip} from "../guideModeContext";
+import LoadingSpinner from "../loadingSpinner";
 
 const SkeletonCard = () => {
     return (
@@ -122,11 +123,19 @@ function Dashboard({switchView, view}) {
             ) {
                 continue;
             }
-            toRender.push(
-                <Col key={processes[i].id} {...dynamicColSizes} className={rowClasses}>
+            if (api.cardMode()) {
+                toRender.push(
+                    <Col key={processes[i].id} {...dynamicColSizes} className={rowClasses}>
+                        <ProcessCard process={processes[i]}/>
+                    </Col>
+                );
+            } else {
+                // push ProcessCard as table row
+
+                toRender.push(
                     <ProcessCard process={processes[i]}/>
-                </Col>
-            );
+                );
+            }
         }
         return toRender;
     };
@@ -143,6 +152,146 @@ function Dashboard({switchView, view}) {
         process.isPinned()
     );
 
+    if (api.cardMode()) {
+        return (
+            <div>
+                <NavBarHeader switchView={switchView} view={view}/>
+                <div className="floating-container">
+                    <Container style={{justifyContent: 'center'}}>
+                        <Form>
+                            <Form.Group className="mb-3" controlId="formBasicSearch">
+                                <WrapInTooltip text={api.loc("guide", "search")} placement={"left"}>
+                                    <Form.Control type="search" placeholder={api.loc('search_placeholder')}
+                                                  value={searchText}
+                                                  onChange={(e) => setSearchText(e.target.value)}/>
+                                </WrapInTooltip>
+
+                            </Form.Group>
+                        </Form>
+                    </Container>
+                </div>
+
+                <Container
+                    className='mt-4'
+                    style={{borderRadius: '10px'}}
+                >
+                    <WrapInTooltip text={api.loc("guide", "pinned_processes")} placement={"right"}>
+                        <h4>{api.loc("pinned_processes")}</h4>
+                    </WrapInTooltip>
+
+                    {isLoading ? (
+                            <Row className={rowClasses}>
+                                {Array.from({length: 3}).map((_, index) => (
+                                    <Col key={index} className={rowClasses}>
+                                        <SkeletonCard/>
+                                    </Col>
+                                ))}
+                            </Row> // Placeholder for your loading animation
+                        ) : // <Row className={rowClasses}>{renderProcessCards(pinnedProcesses)}</Row>
+                        pinnedProcesses.length > 0 ? (
+                            <Row className={rowClasses}>
+                                {renderProcessCards(pinnedProcesses)}
+                            </Row>
+                        ) : (
+                            <div className='d-flex justify-content-center'>
+                                <p>{api.loc("no_pin_processes")}</p>
+                            </div>
+                        )}
+
+                    <h4 className='mt-4'>{api.loc("all_processes")}</h4>
+
+                    <Tabs
+                        activeKey={selectedTab}
+                        onSelect={(k) => setSelectedTab(k)}
+                        className='mb-4'
+                    >
+                        <Tab eventKey='none' title={
+                            <WrapInTooltip text={api.loc("guide", "processes_no_group")} placement={"left"}>
+                                <div>{api.loc("no_group")}</div>
+                            </WrapInTooltip>
+                        }>
+                            <Row className={rowClasses}>
+                                {renderProcessCards(
+                                    groupedProcesses.processes.filter((p) => !p.process_group_id)
+                                )}
+                            </Row>
+                        </Tab>
+
+
+                        <Tab eventKey='all'
+                             title={
+                                 <WrapInTooltip text={api.loc("guide", "all_processes")} placement={"bottom"}>
+                                     <div>{api.loc("all")}</div>
+                                 </WrapInTooltip>
+                             }
+                        >
+                            <div>
+                                {isLoading ? (
+                                    <Row className={rowClasses}>
+                                        {Array.from({length: 3}).map((_, index) => (
+                                            <Col key={index} className={rowClasses}>
+                                                <SkeletonCard/>
+                                            </Col>
+                                        ))}
+                                    </Row> // Placeholder for your loading animation
+                                ) : (
+                                    <Row className={rowClasses}>
+                                        {renderProcessCards(groupedProcesses.processes)}
+                                    </Row>
+                                )}
+                            </div>
+                        </Tab>
+
+
+                        {Object.entries(groupedProcesses.groups).map(([groupId, group], index) => (
+                            <Tab eventKey={groupId} title={
+                                /*All but 1st element must have dummy=true by checking index in a list*/
+                                <WrapInTooltip dummy={index !== 0} text={api.loc("guide", "group_name")}
+                                               placement={"right"}>
+                                    <div>
+                                        {selectedTab === groupId ? (
+                                            <div onClick={() => {
+                                                setShowEditGroup(group.id)
+                                            }}>
+                                                {group.name}
+                                                <Gear style={{marginLeft: '5px', marginBottom: '4px'}}></Gear>
+                                            </div>
+                                        ) : (
+                                            group.name
+                                        )}
+                                    </div>
+                                </WrapInTooltip>
+
+                            } key={groupId}>
+                                <EditGroup showEditGroup={showEditGroup} setShowEditGroup={setShowEditGroup}
+                                           group={group}/>
+
+                                <Row className={rowClasses}>
+                                    {renderGroupedProcessCards(groupId)}
+                                </Row>
+                            </Tab>
+                        ))}
+                    </Tabs>
+                </Container>
+
+            </div>
+        );
+    }
+
+    // tables mode
+
+    const tHead = (
+        <thead>
+        <tr style={{textAlign: "center"}}>
+            <th>#</th>
+            <th>{api.loc("process_name")}</th>
+            <th>{api.loc("process_cmd")}</th>
+            <th>{api.loc("process_status")}</th>
+            <th colSpan={4}>{api.loc("process_actions")}</th>
+        </tr>
+        </thead>
+    );
+
     return (
         <div>
             <NavBarHeader switchView={switchView} view={view}/>
@@ -151,10 +300,10 @@ function Dashboard({switchView, view}) {
                     <Form>
                         <Form.Group className="mb-3" controlId="formBasicSearch">
                             <WrapInTooltip text={api.loc("guide", "search")} placement={"left"}>
-                                <Form.Control type="search" placeholder={api.loc('search_placeholder')} value={searchText}
+                                <Form.Control type="search" placeholder={api.loc('search_placeholder')}
+                                              value={searchText}
                                               onChange={(e) => setSearchText(e.target.value)}/>
                             </WrapInTooltip>
-
                         </Form.Group>
                     </Form>
                 </Container>
@@ -162,30 +311,25 @@ function Dashboard({switchView, view}) {
 
             <Container
                 className='mt-4'
-                style={{background: 'rgba(255, 255, 255, 0.6)', borderRadius: '10px'}}
+                style={{borderRadius: '10px'}}
             >
-                <WrapInTooltip text={api.loc("guide", "pinned_processes")} placement={"bottom"}>
+                <WrapInTooltip text={api.loc("guide", "pinned_processes")} placement={"right"}>
                     <h4>{api.loc("pinned_processes")}</h4>
                 </WrapInTooltip>
 
-                {isLoading ? (
-                        <Row className={rowClasses}>
-                            {Array.from({length: 3}).map((_, index) => (
-                                <Col key={index} className={rowClasses}>
-                                    <SkeletonCard/>
-                                </Col>
-                            ))}
-                        </Row> // Placeholder for your loading animation
-                    ) : // <Row className={rowClasses}>{renderProcessCards(pinnedProcesses)}</Row>
-                    pinnedProcesses.length > 0 ? (
-                        <Row className={rowClasses}>
-                            {renderProcessCards(pinnedProcesses)}
-                        </Row>
-                    ) : (
-                        <div className='d-flex justify-content-center'>
-                            <p>{api.loc("no_pin_processes")}</p>
-                        </div>
-                    )}
+                {isLoading ? <LoadingSpinner/> : (pinnedProcesses.length > 0 ? (
+                    <Table responsive striped bordered hover size="sm">
+                        {tHead}
+                        <tbody>
+                        {renderProcessCards(pinnedProcesses)}
+                        </tbody>
+                    </Table>
+                ) : (
+                    <div className='d-flex justify-content-center'>
+                        <p>{api.loc("no_pin_processes")}</p>
+                    </div>
+                ))
+                }
 
                 <h4 className='mt-4'>{api.loc("all_processes")}</h4>
 
@@ -199,13 +343,17 @@ function Dashboard({switchView, view}) {
                             <div>{api.loc("no_group")}</div>
                         </WrapInTooltip>
                     }>
-                        <Row className={rowClasses}>
-                            {renderProcessCards(
-                                groupedProcesses.processes.filter((p) => !p.process_group_id)
-                            )}
-                        </Row>
+                        <div>
+                            {isLoading ? <LoadingSpinner/> : (<Table responsive striped bordered hover size="sm">
+                                {tHead}
+                                <tbody>
+                                {renderProcessCards(
+                                    groupedProcesses.processes.filter((p) => !p.process_group_id)
+                                )}
+                                </tbody>
+                            </Table>)}
+                        </div>
                     </Tab>
-
 
                     <Tab eventKey='all'
                          title={
@@ -215,27 +363,20 @@ function Dashboard({switchView, view}) {
                          }
                     >
                         <div>
-                            {isLoading ? (
-                                <Row className={rowClasses}>
-                                    {Array.from({length: 3}).map((_, index) => (
-                                        <Col key={index} className={rowClasses}>
-                                            <SkeletonCard/>
-                                        </Col>
-                                    ))}
-                                </Row> // Placeholder for your loading animation
-                            ) : (
-                                <Row className={rowClasses}>
-                                    {renderProcessCards(groupedProcesses.processes)}
-                                </Row>
-                            )}
+                            {isLoading ? <LoadingSpinner/> : (<Table responsive striped bordered hover size="sm">
+                                {tHead}
+                                <tbody>
+                                {renderProcessCards(groupedProcesses.processes)}
+                                </tbody>
+                            </Table>)}
                         </div>
                     </Tab>
-
 
                     {Object.entries(groupedProcesses.groups).map(([groupId, group], index) => (
                         <Tab eventKey={groupId} title={
                             /*All but 1st element must have dummy=true by checking index in a list*/
-                            <WrapInTooltip dummy={index !== 0} text={api.loc("guide", "group_name")} placement={"right"}>
+                            <WrapInTooltip dummy={index !== 0} text={api.loc("guide", "group_name")}
+                                           placement={"right"}>
                                 <div>
                                     {selectedTab === groupId ? (
                                         <div onClick={() => {
@@ -253,17 +394,19 @@ function Dashboard({switchView, view}) {
                         } key={groupId}>
                             <EditGroup showEditGroup={showEditGroup} setShowEditGroup={setShowEditGroup} group={group}/>
 
-                            <Row className={rowClasses}>
+                            {isLoading ? <LoadingSpinner/> : (<Table responsive striped bordered hover size="sm">
+                                {tHead}
+                                <tbody>
                                 {renderGroupedProcessCards(groupId)}
-                            </Row>
+                                </tbody>
+                            </Table>)}
                         </Tab>
                     ))}
                 </Tabs>
             </Container>
-
         </div>
-
     );
+
 }
 
 export default Dashboard;

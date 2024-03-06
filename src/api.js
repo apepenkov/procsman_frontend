@@ -40,6 +40,7 @@ const locales = {
             group_name: 'You can select a group and click on it again to edit it.',
             search: 'You can search for a process by part of its name or command line. Processes, not matching the search, will be hidden.',
             add_process: 'You can add a new process by clicking this button.',
+            settings: "You can change language and process mode (cards or table) in the settings.",
         },
         close: 'Close',
         unknown_error: 'Unknown error, status:',
@@ -140,6 +141,13 @@ const locales = {
         key: 'Key',
         search_placeholder: 'Search for process: part of process name or cmd line',
         guide_mode: 'Guide mode',
+        process_cmd: 'Process cmd',
+        process_enabled: 'Is enabled',
+        process_actions: 'Actions',
+        select_mode: 'Select mode',
+        card_mode: 'Card mode',
+        table_mode: 'Table mode',
+        switch_theme: 'Switch theme',
     },
     ru: {
         errors: {
@@ -181,7 +189,8 @@ const locales = {
             all_processes: "Все процессы будут показаны здесь.",
             group_name: "Вы можете выбрать группу и снова нажать на нее, чтобы отредактировать ее.",
             search: "Вы можете искать процесс по части его имени или командной строки. Процессы, не соответствующие поиску, будут скрыты.",
-            add_process: "Вы можете добавить новый процесс, нажав эту кнопку."
+            add_process: "Вы можете добавить новый процесс, нажав эту кнопку.",
+            settings: "Вы можете изменить язык и режим процесса (карточки или таблица) в настройках."
         },
         close: "Закрыть",
         unknown_error: "Неизвестная ошибка, статус:",
@@ -281,7 +290,14 @@ const locales = {
         ram_usage: "Использование ОЗУ (МБ)",
         key: "Ключ",
         search_placeholder: "поиск процесса: часть имени процесса или командной строки",
-        guide_mode: "Режим помощи"
+        guide_mode: "Режим помощи",
+        process_cmd: "Команда процесса",
+        process_enabled: "Включен",
+        process_actions: "Действия",
+        select_mode: "Выберите режим",
+        card_mode: "Режим карточек",
+        table_mode: "Режим таблицы",
+        switch_theme: "Переключить тему",
     }
 };
 
@@ -318,7 +334,7 @@ function formatString(template, values) {
 
 // ('RUNNING', 'STOPPED', 'CRASHED', 'STARTING', 'STOPPING', 'STOPPED_WILL_RESTART', 'CRASHED_WILL_RESTART', 'UNKNOWN');
 const processStatusColors = {
-    RUNNING: '#00FF00',
+    RUNNING: '#71ab71',
     STOPPED: '#fd9b12',
     CRASHED: '#ff0000',
     STARTING: '#c2fd12',
@@ -669,6 +685,14 @@ class ApiInterface {
         this.url = process.env.REACT_APP_API_ENDPOINT;
         this.localeKey = window.localStorage.getItem('locale') || 'en';
         this.authToken = window.localStorage.getItem('authToken');
+        const savedCardMode = window.localStorage.getItem('cardMode');
+        if (savedCardMode === null) {
+            // if we're on mobile, set card mode, on desktop, set table mode
+            this.isCardMode = window.innerWidth < 768;
+        } else {
+            this.isCardMode = savedCardMode !== 'false';
+        }
+        this.theme = window.localStorage.getItem('theme') || 'dark';
         this.popUpCallback = null;
         this.cardsChangedCallbackDashboard = null;
         this.cardsChangedCallbackNavbar = null;
@@ -695,6 +719,16 @@ class ApiInterface {
                 this.ticker();
             }, 1000);
         }
+    }
+
+    cardMode() {
+        return this.isCardMode;
+    }
+
+    setCardMode(cardMode) {
+        this.isCardMode = cardMode;
+        window.localStorage.setItem('cardMode', cardMode);
+        this.mbCallback();
     }
 
     setPopUpCallback(callback) {
@@ -844,6 +878,8 @@ class ApiInterface {
     save() {
         window.localStorage.setItem('authToken', this.authToken);
         window.localStorage.setItem('locale', this.localeKey);
+        window.localStorage.setItem('cardMode', this.isCardMode);
+        window.localStorage.setItem('theme', this.theme);
     }
 
     async getProcesses() {
