@@ -19,7 +19,7 @@ RUN npm install -g serve
 
 WORKDIR /app
 
-COPY --from=build-stage /app/build /app
+COPY --from=build-stage /app/build /app/build
 
 EXPOSE 17466
 
