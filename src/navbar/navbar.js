@@ -177,7 +177,7 @@ function NavBarHeader({switchView, view}) {
 
     return (
         <Navbar
-            // bg='light'
+            bg={theme === 'dark' ? 'dark' : 'light'}
             expand='lg'
             style={{marginBottom: '20px'}}
             sticky='top'
