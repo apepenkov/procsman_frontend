@@ -20,4 +20,4 @@ COPY --from=build-stage /app/build /app
 
 EXPOSE 17466
 
-CMD ["serve", "-s", "build", "-l", "tcp://127.0.0.1:17466"]
+CMD ["serve", "-s", "build", "-l", "tcp://0.0.0.0:17466"]
