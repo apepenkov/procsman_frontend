@@ -28,44 +28,21 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
         newFormErrors[key] = value;
         setFormErrors(newFormErrors);
     };
+    
+    const cfg = (a, b) => {
+        return a === undefined ? b : a;
+    }
 
     // configuration
-    const [autoRestartOnStop, setAutoRestartOnStop] = useState(
-        group.scripts_configuration.auto_auto_restart_on_stop ||
-        api.getConfiguration('auto_auto_restart_on_stop')
-    );
-    const [autoRestartOnCrash, setAutoRestartOnCrash] = useState(
-        group.scripts_configuration.auto_auto_restart_on_crash ||
-        api.getConfiguration('auto_auto_restart_on_crash')
-    );
-    const [autoRestartMaxRetries, setAutoRestartMaxRetries] = useState(
-        group.scripts_configuration.auto_restart_max_retries ||
-        api.getConfiguration('auto_restart_max_retries')
-    );
-    const [autoRestartMaxRetriesFrame, setAutoRestartMaxRetriesFrame] = useState(
-        group.scripts_configuration.auto_restart_max_retries_frame ||
-        api.getConfiguration('auto_restart_max_retries_frame')
-    );
-    const [autoRestartDelay, setAutoRestartDelay] = useState(
-        group.scripts_configuration.auto_restart_delay ||
-        api.getConfiguration('auto_restart_delay')
-    );
-    const [notifyOnCrash, setNotifyOnCrash] = useState(
-        group.scripts_configuration.notify_on_crash ||
-        api.getConfiguration('notify_on_crash')
-    );
-    const [notifyOnStop, setNotifyOnStop] = useState(
-        group.scripts_configuration.notify_on_stop ||
-        api.getConfiguration('notify_on_stop')
-    );
-    const [notifyOnStart, setNotifyOnStart] = useState(
-        group.scripts_configuration.notify_on_start ||
-        api.getConfiguration('notify_on_start')
-    );
-    const [notifyOnReStart, setNotifyOnReStart] = useState(
-        group.scripts_configuration.notify_on_restart ||
-        api.getConfiguration('notify_on_restart')
-    );
+    const [autoRestartOnStop, setAutoRestartOnStop] = useState(api.getConfiguration('auto_restart_on_stop', group.id));
+    const [autoRestartOnCrash, setAutoRestartOnCrash] = useState(api.getConfiguration('auto_restart_on_crash', group.id));
+    const [autoRestartMaxRetries, setAutoRestartMaxRetries] = useState(api.getConfiguration('auto_restart_max_retries', group.id));
+    const [autoRestartMaxRetriesFrame, setAutoRestartMaxRetriesFrame] = useState(api.getConfiguration('auto_restart_max_retries_frame', group.id));
+    const [autoRestartDelay, setAutoRestartDelay] = useState(api.getConfiguration('auto_restart_delay', group.id));
+    const [notifyOnCrash, setNotifyOnCrash] = useState(api.getConfiguration('notify_on_crash', group.id));
+    const [notifyOnStop, setNotifyOnStop] = useState(api.getConfiguration('notify_on_stop', group.id));
+    const [notifyOnStart, setNotifyOnStart] = useState(api.getConfiguration('notify_on_start', group.id));
+    const [notifyOnReStart, setNotifyOnReStart] = useState(api.getConfiguration('notify_on_restart', group.id));
 
     // UNUSED
     const [recordStats, setRecordStats] = useState(
@@ -80,8 +57,8 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
             name: groupName,
             color: rgbaToHex(groupColor),
             config: {
-                auto_auto_restart_on_stop: autoRestartOnStop,
-                auto_auto_restart_on_crash: autoRestartOnCrash,
+                auto_restart_on_stop: autoRestartOnStop,
+                auto_restart_on_crash: autoRestartOnCrash,
                 auto_restart_max_retries: parseInt(autoRestartMaxRetries),
                 auto_restart_max_retries_frame: parseInt(autoRestartMaxRetriesFrame),
                 auto_restart_delay: parseInt(autoRestartDelay),
@@ -172,7 +149,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                     <Form.Check
                         type='switch'
                         label={api.loc("auto_restart_on_stop")}
-                        defaultChecked={autoRestartOnStop}
+                        checked={autoRestartOnStop}
                         onChange={(e) => setAutoRestartOnStop(e.target.checked)}
                     />
                 </Form.Group>
@@ -180,7 +157,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                     <Form.Check
                         type='switch'
                         label={api.loc("auto_restart_on_crash")}
-                        defaultChecked={autoRestartOnCrash}
+                        checked={autoRestartOnCrash}
                         onChange={(e) => setAutoRestartOnCrash(e.target.checked)}
                     />
                 </Form.Group>
@@ -188,7 +165,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                     <Form.Label>{api.loc("max_retries")}</Form.Label>
                     <Form.Control
                         type='number'
-                        defaultValue={autoRestartMaxRetries}
+                        value={autoRestartMaxRetries}
                         onChange={(e) => {
                             const val = e.target.value;
                             const validationErr = api.validate(
@@ -219,7 +196,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                     </Form.Label>
                     <Form.Control
                         type='number'
-                        defaultValue={autoRestartMaxRetriesFrame}
+                        value={autoRestartMaxRetriesFrame}
                         onChange={(e) => {
                             const val = e.target.value;
                             const validationErr = api.validate(
@@ -250,7 +227,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                     </Form.Label>
                     <Form.Control
                         type='number'
-                        defaultValue={autoRestartDelay}
+                        value={autoRestartDelay}
                         onChange={(e) => {
                             const val = e.target.value;
                             const validationErr = api.validate(
@@ -279,7 +256,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                     <Form.Check
                         type='switch'
                         label={api.loc("notify_on_crash")}
-                        defaultChecked={notifyOnCrash}
+                        checked={notifyOnCrash}
                         onChange={(e) => setNotifyOnCrash(e.target.checked)}
                     />
                 </Form.Group>
@@ -287,7 +264,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                     <Form.Check
                         type='switch'
                         label={api.loc("notify_on_stop")}
-                        defaultChecked={notifyOnStop}
+                        checked={notifyOnStop}
                         onChange={(e) => setNotifyOnStop(e.target.checked)}
                     />
                 </Form.Group>
@@ -295,7 +272,7 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                     <Form.Check
                         type='switch'
                         label={api.loc("notify_on_start")}
-                        defaultChecked={notifyOnStart}
+                        checked={notifyOnStart}
                         onChange={(e) => setNotifyOnStart(e.target.checked)}
                     />
                 </Form.Group>
@@ -303,13 +280,20 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                     <Form.Check
                         type='switch'
                         label={api.loc("notify_on_restart")}
-                        defaultChecked={notifyOnReStart}
+                        checked={notifyOnReStart}
                         onChange={(e) => setNotifyOnReStart(e.target.checked)}
                     />
                 </Form.Group>
             </Modal.Body>
             <Modal.Footer
             >
+                <Button variant={'danger'} onClick={() => {
+                    api.deleteGroup(group.id).then(() => {
+                        setShowEditGroup(null);
+                    });
+                }}>
+                    {api.loc("delete")}
+                </Button>
                 <Button variant='secondary' onClick={() => {
                     setShowEditGroup(null)
                 }}>

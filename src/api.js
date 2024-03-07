@@ -168,6 +168,7 @@ const locales = {
         card_mode: 'Card mode',
         table_mode: 'Table mode',
         switch_theme: 'Switch theme',
+        delete: 'Delete',
     },
     ru: {
         errors: {
@@ -338,6 +339,7 @@ const locales = {
         card_mode: "Режим карточек",
         table_mode: "Режим таблицы",
         switch_theme: "Переключить тему",
+        delete: "Удалить"
     }
 };
 
@@ -386,8 +388,8 @@ const processStatusColors = {
 
 const fallbackConfiguration = new Map(
     Object.entries({
-        auto_auto_restart_on_stop: true,
-        auto_auto_restart_on_crash: true,
+        auto_restart_on_stop: true,
+        auto_restart_on_crash: true,
 
         auto_restart_max_retries: 3,
         auto_restart_max_retries_frame: 60,
@@ -590,10 +592,10 @@ class ProcessInfo {
         if (this.configuration === null) {
             return api.getConfiguration(key, this.process_group_id);
         }
-        return (
-            this.configuration.get(key) ||
-            api.getConfiguration(key, this.process_group_id)
-        );
+        if (this.configuration.get(key) === undefined) {
+            return api.getConfiguration(key, this.process_group_id);
+        }
+        return this.configuration.get(key);
     }
 }
 
@@ -1189,10 +1191,10 @@ class ApiInterface {
         if (groupConfig === null) {
             return this._internalGetConfigurationWithFallback(key);
         }
-
-        return (
-            groupConfig.get(key) || this._internalGetConfigurationWithFallback(key)
-        );
+        if (groupConfig.get(key) === undefined) {
+            return this._internalGetConfigurationWithFallback(key);
+        }
+        return groupConfig.get(key);
     }
 
     validate(where, what, value) {
@@ -1295,6 +1297,21 @@ class ApiInterface {
         } catch (e) {
             return null;
         }
+    }
+
+    async deleteGroup(groupId) {
+        try {
+            const res = await this.request(
+                'DELETE',
+                '/groups/by_id/' + groupId,
+                configPopupAndThrow
+            );
+            await this.mbCallback();
+            return res;
+        } catch (e) {
+            return null;
+        }
+
     }
 }
 

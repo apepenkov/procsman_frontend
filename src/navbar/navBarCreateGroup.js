@@ -32,10 +32,10 @@ const NewGroupModal = ({show, handleClose, groups}) => {
 
     // configuration
     const [autoRestartOnStop, setAutoRestartOnStop] = useState(
-        api.getConfiguration('auto_auto_restart_on_stop')
+        api.getConfiguration('auto_restart_on_stop')
     );
     const [autoRestartOnCrash, setAutoRestartOnCrash] = useState(
-        api.getConfiguration('auto_auto_restart_on_crash')
+        api.getConfiguration('auto_restart_on_crash')
     );
     const [autoRestartMaxRetries, setAutoRestartMaxRetries] = useState(
         api.getConfiguration('auto_restart_max_retries')
@@ -74,8 +74,8 @@ const NewGroupModal = ({show, handleClose, groups}) => {
             name: newGroupName,
             color: rgbaToHex(newGroupColor),
             config: {
-                auto_auto_restart_on_stop: autoRestartOnStop,
-                auto_auto_restart_on_crash: autoRestartOnCrash,
+                auto_restart_on_stop: autoRestartOnStop,
+                auto_restart_on_crash: autoRestartOnCrash,
                 auto_restart_max_retries: parseInt(autoRestartMaxRetries),
                 auto_restart_max_retries_frame: parseInt(autoRestartMaxRetriesFrame),
                 auto_restart_delay: parseInt(autoRestartDelay),

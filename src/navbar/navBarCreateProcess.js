@@ -51,10 +51,10 @@ const NewProcessModal = ({show, handleClose, groups}) => {
 
     // configuration
     const [autoRestartOnStop, setAutoRestartOnStop] = useState(
-        api.getConfiguration('auto_auto_restart_on_stop')
+        api.getConfiguration('auto_restart_on_stop')
     );
     const [autoRestartOnCrash, setAutoRestartOnCrash] = useState(
-        api.getConfiguration('auto_auto_restart_on_crash')
+        api.getConfiguration('auto_restart_on_crash')
     );
     const [autoRestartMaxRetries, setAutoRestartMaxRetries] = useState(
         api.getConfiguration('auto_restart_max_retries')
@@ -238,10 +238,10 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                         setWorkingDirectory('');
                         setEnabled(true);
                         setAutoRestartOnStop(
-                            api.getConfiguration('auto_auto_restart_on_stop')
+                            api.getConfiguration('auto_restart_on_stop')
                         );
                         setAutoRestartOnCrash(
-                            api.getConfiguration('auto_auto_restart_on_crash')
+                            api.getConfiguration('auto_restart_on_crash')
                         );
                         setAutoRestartMaxRetries(
                             api.getConfiguration('auto_restart_max_retries')
@@ -404,11 +404,14 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                             const value = e.target.value;
                             setSelectedGroupId(value);
                             if (value !== 'addNew' && value !== null) {
+                                const group = groups.find(
+                                    (group) => group.id === parseInt(value)
+                                );
                                 setAutoRestartOnStop(
-                                    api.getConfiguration('auto_auto_restart_on_stop', value)
+                                    api.getConfiguration('auto_restart_on_stop', value)
                                 );
                                 setAutoRestartOnCrash(
-                                    api.getConfiguration('auto_auto_restart_on_crash', value)
+                                    api.getConfiguration('auto_restart_on_crash', value)
                                 );
                                 setAutoRestartMaxRetries(
                                     api.getConfiguration('auto_restart_max_retries', value)

@@ -109,10 +109,10 @@ function ProcessCardEdit({
 
     // configuration
     const [autoRestartOnStop, setAutoRestartOnStop] = useState(
-        process.getConfiguration('auto_auto_restart_on_stop')
+        process.getConfiguration('auto_restart_on_stop')
     );
     const [autoRestartOnCrash, setAutoRestartOnCrash] = useState(
-        process.getConfiguration('auto_auto_restart_on_crash')
+        process.getConfiguration('auto_restart_on_crash')
     );
     const [autoRestartMaxRetries, setAutoRestartMaxRetries] = useState(
         process.getConfiguration('auto_restart_max_retries')
@@ -184,9 +184,9 @@ function ProcessCardEdit({
         setProgramArguments(process.arguments);
         setEnabled(process.enabled);
 
-        setAutoRestartOnStop(process.getConfiguration('auto_auto_restart_on_stop'));
+        setAutoRestartOnStop(process.getConfiguration('auto_restart_on_stop'));
         setAutoRestartOnCrash(
-            process.getConfiguration('auto_auto_restart_on_crash')
+            process.getConfiguration('auto_restart_on_crash')
         );
         setAutoRestartMaxRetries(
             process.getConfiguration('auto_restart_max_retries')
@@ -473,10 +473,10 @@ function ProcessCardEdit({
                         setSelectedGroupId(value);
                         if (value !== 'addNew' && value !== null) {
                             setAutoRestartOnStop(
-                                process.getConfiguration('auto_auto_restart_on_stop', value)
+                                process.getConfiguration('auto_restart_on_stop', value)
                             );
                             setAutoRestartOnCrash(
-                                process.getConfiguration('auto_auto_restart_on_crash', value)
+                                process.getConfiguration('auto_restart_on_crash', value)
                             );
                             setAutoRestartMaxRetries(
                                 process.getConfiguration('auto_restart_max_retries', value)
