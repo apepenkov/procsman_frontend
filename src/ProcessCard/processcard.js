@@ -177,7 +177,7 @@ function ProcessCard({process}) {
                                     color: process.statusColor(),
                                 }}
                             >
-                              {process.status}
+                              {process.localizedStatus()}
                             </span>
                         </div>
                     </Card.Subtitle>
@@ -286,7 +286,7 @@ function ProcessCard({process}) {
                         color: process.statusColor(),
                     }}
                 >
-                              {process.status}
+                              {process.localizedStatus()}
                             </span>
             </div>}</td>
             <td>

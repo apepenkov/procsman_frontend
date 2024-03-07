@@ -247,7 +247,7 @@ function ProcessCardStats({process, selectedTab, showDetails}) {
                 {events.map((event, index) => (
                     <tr key={index}>
                         <td>{new Date(event.time * 1000).toLocaleString()}</td>
-                        <td>{event.event}</td>
+                        <td>{api.loc("events", event.event)}</td>
                     </tr>
                 ))}
                 </tbody>

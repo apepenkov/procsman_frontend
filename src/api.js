@@ -42,6 +42,26 @@ const locales = {
             add_process: 'You can add a new process by clicking this button.',
             settings: "You can change language and process mode (cards or table) in the settings.",
         },
+        events: {
+            UNKNOWN: "Unknown",
+            START: "Start",
+            STOP: "Stop",
+            CRASH: "Crash",
+            FULL_STOP: "Full stop",
+            FULL_CRASH: "Full crash",
+            MANUALLY_STOPPED: "Manually stopped",
+            RESTART: "Restart",
+        },
+        status: {
+            RUNNING: "Running",
+            STOPPED: "Stopped",
+            CRASHED: "Crashed",
+            STARTING: "Starting",
+            STOPPING: "Stopping",
+            STOPPED_WILL_RESTART: "Stopped, will restart",
+            CRASHED_WILL_RESTART: "Crashed, will restart",
+            UNKNOWN: "Unknown",
+        },
         close: 'Close',
         unknown_error: 'Unknown error, status:',
         error_making_request: 'Error making request: ',
@@ -191,6 +211,26 @@ const locales = {
             search: "Вы можете искать процесс по части его имени или командной строки. Процессы, не соответствующие поиску, будут скрыты.",
             add_process: "Вы можете добавить новый процесс, нажав эту кнопку.",
             settings: "Вы можете изменить язык и режим процесса (карточки или таблица) в настройках."
+        },
+        events: {
+            UNKNOWN: "Неизвестно",
+            START: "Запуск",
+            STOP: "Остановка",
+            CRASH: "Сбой",
+            FULL_STOP: "Полная остановка",
+            FULL_CRASH: "Полный сбой",
+            MANUALLY_STOPPED: "Остановлен вручную",
+            RESTART: "Перезапуск"
+        },
+        status: {
+            RUNNING: "Запущен",
+            STOPPED: "Остановлен",
+            CRASHED: "Сбой",
+            STARTING: "Запуск",
+            STOPPING: "Остановка",
+            STOPPED_WILL_RESTART: "Остановлен, будет перезапущен",
+            CRASHED_WILL_RESTART: "Сбой, будет перезапущен",
+            UNKNOWN: "Неизвестно",
         },
         close: "Закрыть",
         unknown_error: "Неизвестная ошибка, статус:",
@@ -412,6 +452,9 @@ class ProcessInfo {
         this.pinned = null;
     }
 
+    localizedStatus() {
+        return api.loc('status', this.status);
+    }
     rgbaColor() {
         if (this.placeholder) {
             return 'rgba(0, 0, 0, 0)';
