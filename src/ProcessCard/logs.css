@@ -2,7 +2,7 @@
     counter-reset: line;
     font-family: monospace;
     overflow: auto;
-    background: rgba(0, 0, 0, 0.1);
+    /*background: rgba(0, 0, 0, 0.1);*/
     padding: 1rem 1rem 1rem 4rem; /* Increase left padding to accommodate wider line numbers */
     border-radius: 10px;
     white-space: pre-wrap;
@@ -31,12 +31,7 @@
     width: 45px; /* Adjust the width as needed */
     text-align: right;
     color: #888; /* Line number color */
-    background: rgba(
-            0,
-            0,
-            0,
-            0.1
-    ); /* Ensure background matches log-container for seamless integration */
+    /*background: rgba(0,0,0,0.1);*/
     border-right: 1px solid #ddd;
     padding-right: 10px; /* Ensures a gap between line numbers and log text */
     line-height: 1.2em; /* Aligns with the log line height */
@@ -44,11 +39,11 @@
 }
 
 .log-line:nth-child(odd) {
-    background-color: #f2f2f2;
+    /*background-color: #f2f2f2;*/
 }
 
 .log-line:nth-child(even) {
-    background-color: #e6e6e6;
+    background-color: rgba(108, 108, 108, 0.18);
 }
 
 .highlight {
@@ -58,3 +53,8 @@
 .current-highlight {
     background-color: orange; /* Or any other color */
 }
+
+.log-line:hover {
+    background-color: rgba(187, 187, 187, 0.32); /* Change color as needed */
+}
+
