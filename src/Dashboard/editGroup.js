@@ -43,14 +43,8 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
     const [notifyOnStop, setNotifyOnStop] = useState(api.getConfiguration('notify_on_stop', group.id));
     const [notifyOnStart, setNotifyOnStart] = useState(api.getConfiguration('notify_on_start', group.id));
     const [notifyOnReStart, setNotifyOnReStart] = useState(api.getConfiguration('notify_on_restart', group.id));
-
-    // UNUSED
-    const [recordStats, setRecordStats] = useState(
-        api.getConfiguration('record_stats')
-    );
-    const [storeLogs, setStoreLogs] = useState(
-        api.getConfiguration('store_logs')
-    );
+    const [storeLogs, setStoreLogs] = useState(api.getConfiguration('store_logs', group.id));
+    const [recordStats, setRecordStats] = useState(api.getConfiguration('record_stats', group.id));
 
     const SaveGroup = () => {
         const NewGroupParams = {
@@ -282,6 +276,22 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
                         label={api.loc("notify_on_restart")}
                         checked={notifyOnReStart}
                         onChange={(e) => setNotifyOnReStart(e.target.checked)}
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Check
+                        type='switch'
+                        label={api.loc("store_logs")}
+                        checked={storeLogs}
+                        onChange={(e) => setStoreLogs(e.target.checked)}
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Check
+                        type='switch'
+                        label={api.loc("record_stats")}
+                        checked={recordStats}
+                        onChange={(e) => setRecordStats(e.target.checked)}
                     />
                 </Form.Group>
             </Modal.Body>

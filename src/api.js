@@ -169,6 +169,8 @@ const locales = {
         table_mode: 'Table mode',
         switch_theme: 'Switch theme',
         delete: 'Delete',
+        record_stats: 'Record stats',
+        store_logs: 'Store logs',
     },
     ru: {
         errors: {
@@ -339,7 +341,9 @@ const locales = {
         card_mode: "Режим карточек",
         table_mode: "Режим таблицы",
         switch_theme: "Переключить тему",
-        delete: "Удалить"
+        delete: "Удалить",
+        record_stats: "Запись статистики",
+        store_logs: "Хранение журналов",
     }
 };
 

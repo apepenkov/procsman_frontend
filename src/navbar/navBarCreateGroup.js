@@ -306,18 +306,18 @@ const NewGroupModal = ({show, handleClose, groups}) => {
                     />
                 </Form.Group>
 
-                {/*<Form.Group>*/}
-                {/*    <Form.Check type='switch' label='Record stats'*/}
-                {/*                defaultChecked={recordStats}*/}
-                {/*                onChange={(e) => setRecordStats(e.target.checked)}*/}
-                {/*    />*/}
-                {/*</Form.Group>*/}
-                {/*<Form.Group>*/}
-                {/*    <Form.Check type='switch' label='Store logs'*/}
-                {/*                defaultChecked={storeLogs}*/}
-                {/*                onChange={(e) => setStoreLogs(e.target.checked)}*/}
-                {/*    />*/}
-                {/*</Form.Group>*/}
+                <Form.Group>
+                    <Form.Check type='switch' label={api.loc("record_stats")}
+                                defaultChecked={recordStats}
+                                onChange={(e) => setRecordStats(e.target.checked)}
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Check type='switch' label={api.loc("store_logs")}
+                                defaultChecked={storeLogs}
+                                onChange={(e) => setStoreLogs(e.target.checked)}
+                    />
+                </Form.Group>
             </Modal.Body>
 
             <Modal.Footer>

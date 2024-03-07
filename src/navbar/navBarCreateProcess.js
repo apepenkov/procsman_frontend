@@ -673,18 +673,18 @@ const NewProcessModal = ({show, handleClose, groups}) => {
                         onChange={(e) => setNotifyOnRestart(e.target.checked)}
                     />
                 </Form.Group>
-                {/*<Form.Group>*/}
-                {/*    <Form.Check type='switch' label='Record stats'*/}
-                {/*                checked={recordStats}*/}
-                {/*                onChange={(e) => setRecordStats(e.target.checked)}*/}
-                {/*    />*/}
-                {/*</Form.Group>*/}
-                {/*<Form.Group>*/}
-                {/*    <Form.Check type='switch' label='Store logs'*/}
-                {/*                checked={storeLogs}*/}
-                {/*                onChange={(e) => setStoreLogs(e.target.checked)}*/}
-                {/*    />*/}
-                {/*</Form.Group>*/}
+                <Form.Group>
+                    <Form.Check type='switch' label={api.loc("record_stats")}
+                                checked={recordStats}
+                                onChange={(e) => setRecordStats(e.target.checked)}
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Check type='switch' label={api.loc("store_logs")}
+                                checked={storeLogs}
+                                onChange={(e) => setStoreLogs(e.target.checked)}
+                    />
+                </Form.Group>
             </Modal.Body>
 
             <Modal.Footer>
