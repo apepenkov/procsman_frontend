@@ -1311,7 +1311,20 @@ class ApiInterface {
         } catch (e) {
             return null;
         }
+    }
 
+    async deleteProcess(processId) {
+        try {
+            const res = await this.request(
+                'DELETE',
+                '/processes/by_id/' + processId,
+                configPopupAndThrow
+            );
+            await this.mbCallback();
+            return res;
+        } catch (e) {
+            return null;
+        }
     }
 }
 

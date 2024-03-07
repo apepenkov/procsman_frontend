@@ -750,6 +750,17 @@ function ProcessCardEdit({
 
             {/*stick to right*/}
             <Button
+                variant={'danger'}
+                style={{float: 'left'}}
+                onClick={() => {
+                    api.deleteProcess(process.id).finally(() => {
+                        setShowDetails(false);
+                    });
+                }}
+            >
+                {api.loc("delete")}
+            </Button>
+            <Button
                 id='updateProcessBtn'
                 onClick={() => editProcess(true)}
                 disabled={updatingProcess}
