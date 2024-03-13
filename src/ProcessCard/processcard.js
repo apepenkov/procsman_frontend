@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Button, Card, Modal, OverlayTrigger, Tab, Tabs, Tooltip,} from 'react-bootstrap';
-import {Pin, PinFill} from 'react-bootstrap-icons';
+import {Pin, PinFill, Trash} from 'react-bootstrap-icons';
 import api, {buildGradient} from '../api';
 import ProcessCardStats from './processCardStats';
 import ProcessCardLogs from './processCardLogs';
@@ -18,6 +18,9 @@ function ProcessCard({process}) {
     const [selectedTab, setSelectedTab] = useState('status');
     const [stopping, setStopping] = useState(false);
     const [restarting, setRestarting] = useState(false);
+
+    const [deleteButtonPressedOnce, setDeleteButtonPressedOnce] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const startStopProcess = (e) => {
         const res = process.startOrStop();
@@ -112,6 +115,36 @@ function ProcessCard({process}) {
             </Tabs>
         </Modal.Body>
         <Modal.Footer>
+            <Button
+                variant={'danger'}
+                style={{
+                    position: 'absolute',
+                    left: '10px',
+                    bottom: '10px',
+                }}
+                onClick={() => {
+                    if (deleteButtonPressedOnce) {
+                        setDeleteLoading(true);
+                        api.deleteProcess(process.id).finally(() => {
+                            setShowDetails(false);
+                            setDeleteLoading(false);
+                        });
+                    } else {
+                        setDeleteButtonPressedOnce(true);
+                        setTimeout(() => {
+                            setDeleteButtonPressedOnce(false);
+                        }, 3000);
+                    }
+                }}
+            >
+                {deleteLoading? (LoadingSpinner()) : (
+                    <diV>
+                        <Trash></Trash>
+                        {deleteButtonPressedOnce ? ( api.loc("click_again_to_delete")) : (api.loc("delete"))}
+                    </diV>
+                )}
+            </Button>
+
             <Button variant='secondary' onClick={handleDetailsClose}>
                 {api.loc("close")}
             </Button>

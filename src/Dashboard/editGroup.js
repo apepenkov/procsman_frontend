@@ -1,13 +1,13 @@
 import {Form, Modal} from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import LoadingSpinner from "../loadingSpinner";
-import {Pencil} from "react-bootstrap-icons";
+import {Pencil, Trash} from "react-bootstrap-icons";
 import React, {useState} from "react";
 import api, {hexToRgba, rgbaToHex} from "../api";
 import {SketchPicker} from "react-color";
 
 
-function EditGroup({showEditGroup, setShowEditGroup, group}) {
+function EditGroup({showEditGroup, setShowEditGroup, group, setSelectedTab}) {
 
     const [savingGroup, setSavingGroup] = React.useState(false);
     const [formErrors, setFormErrors] = React.useState({});
@@ -45,6 +45,9 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
     const [notifyOnReStart, setNotifyOnReStart] = useState(api.getConfiguration('notify_on_restart', group.id));
     const [storeLogs, setStoreLogs] = useState(api.getConfiguration('store_logs', group.id));
     const [recordStats, setRecordStats] = useState(api.getConfiguration('record_stats', group.id));
+
+    const [deleteButtonPressedOnce, setDeleteButtonPressedOnce] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const SaveGroup = () => {
         const NewGroupParams = {
@@ -297,18 +300,45 @@ function EditGroup({showEditGroup, setShowEditGroup, group}) {
             </Modal.Body>
             <Modal.Footer
             >
-                <Button variant={'danger'} onClick={() => {
-                    api.deleteGroup(group.id).then(() => {
-                        setShowEditGroup(null);
-                    });
-                }}>
-                    {api.loc("delete")}
+                <Button
+                    variant={'danger'}
+                    style={{
+                        position: 'absolute',
+                        left: '10px',
+                        bottom: '10px',
+                    }}
+                    onClick={() => {
+                        if (deleteButtonPressedOnce) {
+                            setDeleteLoading(true);
+                            api.deleteGroup(group.id).finally(() => {
+                                setShowEditGroup(null);
+                                setDeleteLoading(false);
+                                setSelectedTab('all');
+                            });
+                        } else {
+                            setDeleteButtonPressedOnce(true);
+                            setTimeout(() => {
+                                setDeleteButtonPressedOnce(false);
+                            }, 3000);
+                        }
+                    }}
+                >
+                    {deleteLoading? (LoadingSpinner()) : (
+                        <diV>
+                            <Trash></Trash>
+                            {deleteButtonPressedOnce ? ( api.loc("click_again_to_delete")) : (api.loc("delete"))}
+                        </diV>
+                    )}
                 </Button>
+
                 <Button variant='secondary' onClick={() => {
                     setShowEditGroup(null)
                 }}>
                     {api.loc("close")}
                 </Button>
+
+
+
                 <Button
                     variant='primary'
                     onClick={SaveGroup}

@@ -392,7 +392,7 @@ function Dashboard({switchView, view}) {
                             </WrapInTooltip>
 
                         } key={groupId}>
-                            <EditGroup showEditGroup={showEditGroup} setShowEditGroup={setShowEditGroup} group={group}/>
+                            <EditGroup showEditGroup={showEditGroup} setShowEditGroup={setShowEditGroup} group={group} setSelectedTab={setSelectedTab}/>
 
                             {isLoading ? <LoadingSpinner/> : (<Table responsive striped bordered hover size="sm">
                                 {tHead}

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Container, Form, Table} from 'react-bootstrap';
-import {Pencil, X} from 'react-bootstrap-icons'; // Importing icons
+import {Pencil, X, Trash} from 'react-bootstrap-icons'; // Importing icons
 import {SketchPicker} from 'react-color';
 import api, {formatString, hexToRgba, rgbaToHex} from '../api';
 import LoadingSpinner from '../loadingSpinner';
@@ -749,17 +749,7 @@ function ProcessCardEdit({
             </Form.Group>
 
             {/*stick to right*/}
-            <Button
-                variant={'danger'}
-                style={{float: 'left'}}
-                onClick={() => {
-                    api.deleteProcess(process.id).finally(() => {
-                        setShowDetails(false);
-                    });
-                }}
-            >
-                {api.loc("delete")}
-            </Button>
+
             <Button
                 id='updateProcessBtn'
                 onClick={() => editProcess(true)}

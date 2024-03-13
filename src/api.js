@@ -169,6 +169,7 @@ const locales = {
         table_mode: 'Table mode',
         switch_theme: 'Switch theme',
         delete: 'Delete',
+        click_again_to_delete: 'Click again to delete',
         record_stats: 'Record stats',
         store_logs: 'Store logs',
     },
@@ -342,6 +343,7 @@ const locales = {
         table_mode: "Режим таблицы",
         switch_theme: "Переключить тему",
         delete: "Удалить",
+        click_again_to_delete: "Нажмите снова, чтобы удалить",
         record_stats: "Запись статистики",
         store_logs: "Хранение журналов",
     }
